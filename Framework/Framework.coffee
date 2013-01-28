@@ -1,5 +1,5 @@
-Ti.include('ClassFactory.js')
-Ti.include('Lib/analytics.js')
+# Ti.include('ClassFactory.js')
+# Ti.include('Common/Framework/Lib/analytics.js')
 
 root._ = require('Common/Framework/Lib/underscore')._
 _ = root._
@@ -29,6 +29,12 @@ root.Framework = class Framework
     root.moduleNames.push moduleName
     root[moduleName] = {}
     @includePath("Common/Modules/#{moduleName}", true)
+  
+  includeModuleJs: (moduleName) ->
+    Ti.API.info("Including module ..... [#{moduleName}]")
+    root.moduleNames.push moduleName
+    root[moduleName] = {}
+    Ti.include("Modules/#{moduleName}/#{moduleName}.js")
     
   includeDynamicModule: (moduleName) ->
     Ti.API.info("Including Dynamic module ..... [#{moduleName}]")
@@ -107,3 +113,5 @@ root.Framework = class Framework
     @xhr.onerror = () ->
       onError() if onError
     @xhr.send(params)
+
+root.framework = new root.Framework()
