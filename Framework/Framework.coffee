@@ -34,7 +34,7 @@ root.Framework = class Framework
     Ti.API.info("Including module ..... [#{moduleName}]")
     root.moduleNames.push moduleName
     root[moduleName] = {}
-    Ti.include("Modules/#{moduleName}/#{moduleName}.js")
+    Ti.include("/Common/Modules/#{moduleName}/#{moduleName}.js")
     
   includeDynamicModule: (moduleName) ->
     Ti.API.info("Including Dynamic module ..... [#{moduleName}]")
@@ -113,5 +113,3 @@ root.Framework = class Framework
     @xhr.onerror = () ->
       onError() if onError
     @xhr.send(params)
-
-root.framework = new root.Framework()
