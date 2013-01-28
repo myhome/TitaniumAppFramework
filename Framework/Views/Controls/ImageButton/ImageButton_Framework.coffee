@@ -10,7 +10,6 @@ root.ImageButton_Framework = class ImageButton_Framework
     
     @bg = ""
     @bgPressed = ""
-    @enabled
     
     if @options.type == "back"
       @view = @createBackButton(@options)
