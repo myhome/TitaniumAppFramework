@@ -14,8 +14,8 @@ root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.Refi
     }
     label
   
-  createPropertyValue: (value) ->
-    label = super(value)
+  createPropertyDisplay: (display) ->
+    label = super(display)
     label.updateLayout {
       right: 10
       font: { fontSize: 15 }

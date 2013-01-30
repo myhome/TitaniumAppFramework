@@ -40,7 +40,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
 
       if addtoTable      
         row = Ti.UI.createTableViewRow {
-          title: item.title
+          title: item.label
           hasCheck: item.value is @property.value
           selectedBackgroundColor: @settings.rowSelectedBackgroundColor
         }
@@ -48,6 +48,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
           row.setHasCheck true
           @selectedRows.push row
         row.value = item.value
+        row.label = item.label
         row.index = index
         rows.push row
     
@@ -86,7 +87,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
         @selectedRows.push e.row
         e.row.setHasCheck true
         @property.value = @selectedRows[0].value
-        @settings.onChange({ field: @property.field, label: @selectedRows[0].title, value: @selectedRows[0].value})
+        @settings.onChange({ field: @property.field, label: @selectedRows[0].label, value: @selectedRows[0].value})
         @close()
         
       when root.Refine.RefineSelectView.MODE.MULTI
