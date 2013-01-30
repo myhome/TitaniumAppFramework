@@ -59,7 +59,9 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     table.setData groupsSections
     
     if @settings.getRefineButton?
-      container = Ti.UI.createView()
+      container = Ti.UI.createView {
+        height: Ti.UI.SIZE
+      }
       button = @settings.getRefineButton()
       button.addEventListener('click', @refine)
       container.add button
