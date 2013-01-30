@@ -18,7 +18,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
                 { label: 'Option 4', value: 4 }
                 { label: 'Option 5', value: 5 }
               ]
-              mode: root.Refine.RefineSelectView.SINGLE       # SINGLE, MULTI (Defaults to SINGLE)
+              mode: root.Refine.RefineSelectView.Mode.SINGLE  # SINGLE, MULTI (Defaults to SINGLE)
               conditionalProperty: 'MaxPrice'                 # Must be used with conditon method
               condition: (conditionalValue, value) ->         # Evaluate conditional value against set value to return true | false
                 Ti.API.info('Evaluate')

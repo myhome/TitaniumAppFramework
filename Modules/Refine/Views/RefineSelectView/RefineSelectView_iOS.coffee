@@ -16,3 +16,13 @@ root.Refine.RefineSelectView_iOS = class RefineSelectView_iOS extends root.Refin
       onClick: => @close()
     })
     @window.leftNavButton = cancelButton.view
+  
+  createDoneButton: =>
+    cancelButton = root.app.create("ImageButton", {
+      text: "Done"
+      onClick: => @close()
+    })
+    @window.rightNavButton = cancelButton.view
+  
+  clearBackButton: =>
+    @window.leftNavButton = Ti.UI.createView()
