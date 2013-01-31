@@ -15,7 +15,7 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
   createCancelButton: =>
     cancelButton = root.app.create("ImageButton", {
       text: "Cancel"
-      onClick: => @close()
+      onClick: @cancelRefine
     })
     @window.leftNavButton = cancelButton.view
   
@@ -29,6 +29,7 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
   createTable: ->
     table = super
     table.updateLayout {
+      backgroundColor: 'transparent'
       style: Ti.UI.iPhone.TableViewStyle.GROUPED
     }
     table
@@ -37,3 +38,4 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
     row = super(property)
     row.setHeight 44
     row
+    

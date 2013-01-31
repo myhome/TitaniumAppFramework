@@ -30,9 +30,11 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       onRefine: ->
     }, options
     
-    @refineViews = []
+    @cancelled = false
+    # @refineViews = []
     @propertyRows = []
     @changedProperties = {}
+    @changeHistory = []
     
     @add @build()
     
@@ -128,6 +130,10 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     else
       ' '
   
+  cancelRefine: =>
+    @cancelled = true
+    @close()
+  
   reset: =>
     @settings.onReset()
     @close()
@@ -140,30 +146,48 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   ### EVENTS #################################################
   ############################################################
   
+  onClose: =>
+    super
+    if @cancelled
+      for history in @changeHistory
+        history.row.displayControl.setText history.label
+      @changedProperties = []
+      @cancelled = false
+  
   onChange: (e) =>
     propertyRow = root._.find(@propertyRows, (propertyRow) -> return propertyRow.property.field is e.field)
-    propertyRow.displayControl.setText e.label if propertyRow?
-    @changedProperties[e.field] = e.value
+    if propertyRow?
+      @changeHistory.push { row: propertyRow, label: propertyRow.displayControl.getText() }
+      propertyRow.displayControl.setText e.label
+      @changedProperties[e.field] = e.value
     
   onRowClicked: (e) =>
-    refineViews = root._.filter(@refineViews, (view) ->
-      return view.settings.property.title is e.row.property.title
-    )
-    
-    if refineViews.length > 0
-      refineViews[0].update()
-      refineViews[0].show()
-    else
-      view = root.app.create('Refine.RefineSelectView', {
-        getTitleLabel: @settings.getTitleLabel
-        barImage: @settings.barImage
-        rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-        property: e.row.property
-        onChange: @onChange
-        onPropertyFetch: (field) => @changedProperties[field]
-      })
-      if view?
-        @refineViews.push view
-        view.show()
+    root.app.create('Refine.RefineSelectView', {
+      getTitleLabel: @settings.getTitleLabel
+      barImage: @settings.barImage
+      rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+      property: e.row.property
+      onChange: @onChange
+      onPropertyFetch: (field) => @changedProperties[field]
+    }).show()
+    # refineViews = root._.filter(@refineViews, (view) ->
+      # return view.settings.property.title is e.row.property.title
+    # )
+#     
+    # if refineViews.length > 0
+      # refineViews[0].update()
+      # refineViews[0].show()
+    # else
+      # view = root.app.create('Refine.RefineSelectView', {
+        # getTitleLabel: @settings.getTitleLabel
+        # barImage: @settings.barImage
+        # rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+        # property: e.row.property
+        # onChange: @onChange
+        # onPropertyFetch: (field) => @changedProperties[field]
+      # })
+      # if view?
+        # @refineViews.push view
+        # view.show()
   
     
