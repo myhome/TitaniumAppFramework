@@ -19,5 +19,6 @@ root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.Refi
     label.updateLayout {
       right: 10
       font: { fontSize: 15 }
+      width: 150
     }
     label

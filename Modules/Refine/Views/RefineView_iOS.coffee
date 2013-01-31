@@ -38,4 +38,14 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
     row = super(property)
     row.setHeight 44
     row
-    
+  
+  ############################################################
+  ### METHODS ################################################
+  ############################################################
+  
+  updatePropertyRowStatus: (propertyRow, enabled) =>
+    enabled = super(propertyRow, enabled)
+    if enabled
+      propertyRow.selectionStyle = Ti.UI.iPhone.TableViewCellSelectionStyle.BLUE
+    else
+      propertyRow.selectionStyle = Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
