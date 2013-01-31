@@ -136,8 +136,8 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     else
       @updatePropertyRowStatus(propertyRow, false)
   
-  updatePropertyRowStatus: (propertyRow, enabled) =>
-    if enabled
+  updatePropertyRowStatus: (propertyRow, dependencyMissing) =>
+    if dependencyMissing
       propertyRow.titleControl.color = '#ccc'
       propertyRow.removeEventListener('click', @onRowClicked)
     else
