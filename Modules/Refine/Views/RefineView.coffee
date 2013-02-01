@@ -31,12 +31,11 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     }, options
     
     @userCancelled = false
-    @propertyRows = []
+    @propertyRows = {}
     @changeHistory = {}
     @resetProperties = {}
     
     @add @build()
-    
     @createCancelButton()
     @createResetButton()
   
@@ -51,12 +50,17 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     for group in @settings.groups
       section = @createGroupSection()
       for property in group.properties
+        
         propertyRow = @createPropertyRow(property)
-        @propertyRows.push propertyRow
-        @resetProperties[property.field] = { row: propertyRow, label: propertyRow.displayControl.getText(), value: property.value }
+        @propertyRows[property.field] = propertyRow
+        @resetProperties[property.field] = {
+          row: propertyRow
+          label: @getPropertyDisplayLabel(property, property.value)
+          value: property.value
+        }
         section.add propertyRow
+        
       groupsSections.push section
-    
     table.setData groupsSections
     
     if @settings.getRefineButton?
@@ -75,8 +79,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     container.add button
     container
       
-  createTable: ->
-    Ti.UI.createTableView()
+  createTable: -> Ti.UI.createTableView()
   
   createGroupSection: ->
     Ti.UI.createTableViewSection {
@@ -100,7 +103,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     
     row.titleControl = title
     row.displayControl = value
-    row.property = property
+    row.refineProperty = property
     
     @checkDependency(row)
     
@@ -130,19 +133,30 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   ### METHODS ################################################
   ############################################################
   
+  refreshDependencies: =>
+    for field, row of @propertyRows
+      if row.refineProperty.dependency?
+        @checkDependency(row)
+  
   checkDependency: (propertyRow) =>
-    if propertyRow.property.dependency?
-      @updatePropertyRowStatus(propertyRow, true)
+    if propertyRow.refineProperty.dependency?
+      dependencyPropertyRow = @propertyRows[propertyRow.refineProperty.dependency]
+      if dependencyPropertyRow? and dependencyPropertyRow.refineProperty.value?
+        @updatePropertyRowStatus(propertyRow, false)
+      else
+        @updatePropertyRowStatus(propertyRow, true)
     else
       @updatePropertyRowStatus(propertyRow, false)
   
   updatePropertyRowStatus: (propertyRow, dependencyMissing) =>
     if dependencyMissing
       propertyRow.titleControl.color = '#ccc'
-      propertyRow.removeEventListener('click', @onRowClicked)
+      propertyRow.removeEventListener('click', @onRowClicked) if propertyRow.active
+      propertyRow.active = false
     else
       propertyRow.titleControl.color = '#000'
-      propertyRow.addEventListener('click', @onRowClicked)
+      propertyRow.addEventListener('click', @onRowClicked) if !propertyRow.active
+      propertyRow.active = true
   
   getPropertyDisplayLabel: (property, value) ->
     data = root._.find(property.data, (item) -> return item.value is value)
@@ -151,6 +165,16 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     else
       ' '
   
+  getDisplay: (property) =>
+    if property.mode is root.Refine.RefineSelectView.Mode.MULTI
+      if property.value?
+        "Selected #{property.value.length}"
+      else
+        @getPropertyDisplayLabel(property, property.value)
+    else
+      item =  root._.find(property.data, (item) -> item.value is property.value)
+      item.label
+  
   cancelRefine: =>
     @userCancelled = true
     @close()
@@ -158,17 +182,17 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   reset: =>
     for field, obj of @resetProperties
       obj.row.displayControl.setText obj.label
-      obj.row.property.value = obj.value
+      obj.row.refineProperty = root._.extend obj.row.refineProperty, { value: obj.value }
     
     @changeHistory = {}
-    
+    @refreshDependencies()
     @settings.onReset()
   
   refine: =>
     @settings.onRefine ( =>
       updatedProperties= {}
-      for property, obj of @changeHistory
-        updatedProperties[obj.row.property.field] = obj.value
+      for field, obj of @changeHistory
+        updatedProperties[field] = obj.value
       updatedProperties
     )() # Returns a object with property names and their new values
     @close()
@@ -180,31 +204,39 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   onClose: =>
     super
     if @userCancelled
-      for property, obj of @changeHistory
-        obj.row.displayControl.setText obj.originalLabel
-        obj.row.property.value = obj.originalValue
+      for field, obj of @changeHistory
+        propertyRow = @propertyRows[field]
+        if propertyRow?
+          propertyRow.displayControl.setText obj.originalLabel
+          propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: obj.originalValue }
+        
       @changeHistory = {}
       @userCancelled = false
   
-  onChange: (e) =>
-    propertyRow = root._.find(@propertyRows, (propertyRow) -> return propertyRow.property.field is e.field)
-    if propertyRow?
-      @changeHistory[propertyRow.property.field] = {
-        row: propertyRow
-        originalLabel: propertyRow.displayControl.getText()
-        originalValue: propertyRow.property.value
-        value: e.value
-      }
-      propertyRow.property.value = e.value
-      propertyRow.displayControl.setText e.label
+  onFocus: =>
+    super
+    @refreshDependencies()
+  
+  onChange: (change) => # { field: 'name', value: [value] }
+    propertyRow = @propertyRows[change.field]
+    @changeHistory[change.field] = {
+      originalLabel: propertyRow.displayControl.getText()
+      originalValue: propertyRow.refineProperty.value
+      value: change.value
+    }
     
+    propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: change.value }
+    propertyRow.displayControl.setText @getDisplay(propertyRow.refineProperty)
+ 
   onRowClicked: (e) =>
-    root.app.create('Refine.RefineSelectView', {
-      getTitleLabel: @settings.getTitleLabel
-      barImage: @settings.barImage
-      rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-      property: e.row.property
-      onChange: @onChange
-      onPropertyFetch: (field) => if @changeHistory[field]? then @changeHistory[field].value else null
-    }).show()
+    if !@refineSeletView?
+      @refineSeletView = root.app.create('Refine.RefineSelectView', {
+        getTitleLabel: @settings.getTitleLabel
+        barImage: @settings.barImage
+        rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+        onChange: @onChange
+        onPropertyFetch: (field) => if @changeHistory[field]? then @changeHistory[field].value else null
+      })
+    @refineSeletView.update(e.row.refineProperty)
+    @refineSeletView.show()
     
