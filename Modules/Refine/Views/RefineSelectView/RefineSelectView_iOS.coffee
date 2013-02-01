@@ -33,7 +33,10 @@ root.Refine.RefineSelectView_iOS = class RefineSelectView_iOS extends root.Refin
   ############################################################
     
   updateTitle: (title) =>
-    @titleLabel.setText if title? then title else 'Select'
+    if @titleLabel?
+      @titleLabel.setText if title? then title else 'Select'
+    else
+      @window.setTitle if title? then title else 'Select'
     
   showHideCancelButton: (show) =>
     if show
