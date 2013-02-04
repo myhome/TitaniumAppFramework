@@ -75,14 +75,22 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     @updateTitle(@property.title)
     @updateNavButtons(@property.mode)
     
+    if @property.dynamicData?
+      @property.dynamicData {
+        dependencyValue: @settings.onPropertyFetch(@property.dynamicDataDependency)
+        callback: (data) => @populateTable(data)
+      }
+    else
+      @populateTable(@property.data)
+      
+  populateTable: (data) =>
     @table.data =[]
-    
     rows = []
-    for item, index in @property.data
+    for item, index in data
       shouldAddRow = true
       
-      if property.conditionalProperty? and property.condition?
-        conditionalPropertyValue = @settings.onPropertyFetch(property.conditionalProperty)
+      if @property.conditionalProperty? and @property.condition?
+        conditionalPropertyValue = @settings.onPropertyFetch(@property.conditionalProperty)
         if conditionalPropertyValue?
           shouldAddRow = @property.condition(conditionalPropertyValue, item.value)
       

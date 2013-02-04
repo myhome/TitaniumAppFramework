@@ -225,6 +225,17 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       value: change.value
     }
     
+    dynamicFields = root._.filter(@propertyRows, (row) ->
+      row.refineProperty.dynamicDataDependency? and row.refineProperty.dynamicDataDependency is change.field
+    )
+    
+    for row in dynamicFields
+      row.refineProperty = root._.extend row.refineProperty, {
+        value: @resetProperties[row.refineProperty.field].value
+      }
+      row.displayControl.setText @getDisplay(row.refineProperty)
+      delete @changeHistory[row.refineProperty.field]
+    
     propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: change.value }
     propertyRow.displayControl.setText @getDisplay(propertyRow.refineProperty)
  
@@ -235,7 +246,11 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         barImage: @settings.barImage
         rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
         onChange: @onChange
-        onPropertyFetch: (field) => if @changeHistory[field]? then @changeHistory[field].value else null
+        onPropertyFetch: (field) =>
+          if @changeHistory[field]?
+            @changeHistory[field].value
+          else
+            @propertyRows[field].refineProperty.value
         onClose: => @inSelectView = false
       })
     @refineSeletView.update(e.row.refineProperty)
