@@ -7,7 +7,9 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
     if @settings.getTitleLabel?
       titleLabel = @settings.getTitleLabel(@settings.title)
       @window.setTitleControl titleLabel
-      
+    
+    @window.hideTabBar()
+    
   ############################################################
   ### UI #####################################################
   ############################################################
