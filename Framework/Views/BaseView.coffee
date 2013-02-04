@@ -126,7 +126,6 @@ root.BaseView = class BaseView
       root.navGroup.navGroup.close(@window, options)
     else
       @window.close(options)
-    @onClose()
     @isOpen = false
       
   onClose: ->
