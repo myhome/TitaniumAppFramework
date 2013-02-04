@@ -180,13 +180,16 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     @close()
   
   reset: =>
-    for field, obj of @resetProperties
-      obj.row.displayControl.setText obj.label
-      obj.row.refineProperty = root._.extend obj.row.refineProperty, { value: obj.value }
+    resetProperties = @settings.onReset()
+    for field, value of resetProperties
+      row = @propertyRows[field]
+      if row?
+        row.refineProperty = root._.extend row.refineProperty, { value: value }
+        row.displayControl.setText @getDisplay(row.refineProperty)
     
     @changeHistory = {}
     @refreshDependencies()
-    @settings.onReset()
+    @close()
   
   refine: =>
     @settings.onRefine ( =>
