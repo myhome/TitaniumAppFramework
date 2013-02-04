@@ -167,6 +167,8 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     @selectedRows = []
     @table.data = []
     
+    @settings.onClose() if @settings.onClose
+    
   onFocus: =>
     super
     @focusSelected()  

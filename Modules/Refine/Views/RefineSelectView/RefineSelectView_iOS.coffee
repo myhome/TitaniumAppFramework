@@ -5,6 +5,8 @@ root.Refine.RefineSelectView_iOS = class RefineSelectView_iOS extends root.Refin
     if @settings.getTitleLabel?
       @titleLabel = @settings.getTitleLabel(@settings.title)
       @window.setTitleControl @titleLabel
+      
+    @window.hideTabBar()
   
   ############################################################
   ### UI #####################################################

@@ -2,6 +2,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   constructor: (options = {}) ->
     super root._.extend {
       title: 'Refine'
+      closeOnBlur: false
       rowSelectedBackgroundColor: null
       rowValueColor: '#000'
       # groups: [
@@ -213,6 +214,11 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       @changeHistory = {}
       @userCancelled = false
   
+  onBlur: =>
+    super
+    if @settings.closeOnBlur and !@inSelectView
+      @close()
+  
   onFocus: =>
     super
     @refreshDependencies()
@@ -236,7 +242,9 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
         onChange: @onChange
         onPropertyFetch: (field) => if @changeHistory[field]? then @changeHistory[field].value else null
+        onClose: => @inSelectView = false
       })
     @refineSeletView.update(e.row.refineProperty)
+    @inSelectView = true
     @refineSeletView.show()
     
