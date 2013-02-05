@@ -159,7 +159,9 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       propertyRow.active = true
   
   getPropertyDisplayLabel: (property, value) ->
-    data = root._.find(property.data, (item) -> return item.value is value)
+    data = root._.find(property.data, (item) ->
+      return item.value is value
+    )
     if data?
       data.label
     else

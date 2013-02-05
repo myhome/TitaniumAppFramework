@@ -106,7 +106,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
           @selectedRows.push row
         
         row.value = item.value
-        
+        row.index = index
         
         if item.value is @property.default
           @defaultRow = row
