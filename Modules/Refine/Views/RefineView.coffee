@@ -82,9 +82,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   createTable: -> Ti.UI.createTableView()
   
   createGroupSection: ->
-    Ti.UI.createTableViewSection {
-      headerView: Ti.UI.createView { height: 1 }
-    }
+    Ti.UI.createTableViewSection {}
   
   createPropertyRow: (property) =>
     row = Ti.UI.createTableViewRow {
