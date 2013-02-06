@@ -28,6 +28,10 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       # ]
       onReset: -> Ti.API.info 'root.Refine.RefineView.onReset'
       onRefine: -> Ti.API.info 'root.Refine.RefineView.onRefine'
+      onCancel: -> Ti.API.info 'root.Refine.RefineView.onCancel'
+      closeOnCancel: true
+      closeOnReset: true
+      closeOnRefine: true
     }, options
     
     @userCancelled = false
@@ -177,7 +181,8 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   
   cancelRefine: =>
     @userCancelled = true
-    @close()
+    @close() if @settings.closeOnCancel
+    @settings.onCancel()
   
   reset: =>
     resetProperties = @settings.onReset()
@@ -189,7 +194,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     
     @changeHistory = {}
     @refreshDependencies()
-    @close()
+    @close() if @settings.closeOnReset
   
   refine: =>
     @settings.onRefine ( =>
@@ -198,7 +203,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         updatedProperties[field] = obj.value
       updatedProperties
     )() # Returns a object with property names and their new values
-    @close()
+    @close() if @settings.closeOnRefine
     
   ############################################################
   ### EVENTS #################################################
@@ -258,5 +263,6 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       })
     @refineSeletView.update(e.row.refineProperty)
     @inSelectView = true
+    @refineSeletView.settings.navigationGroup = @settings.navigationGroup
     @refineSeletView.show()
     

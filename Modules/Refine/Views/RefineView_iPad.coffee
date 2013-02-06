@@ -10,7 +10,7 @@ root.Refine.RefineView_iPad = class RefineView_iPad extends root.Refine.RefineVi
     label = super(title)
     label.updateLayout {
       left: 10
-      font: { fontSize: 15, fontWeight: 'bold' }
+      font: { fontSize: 16, fontWeight: 'bold' }
     }
     label
   
@@ -18,7 +18,7 @@ root.Refine.RefineView_iPad = class RefineView_iPad extends root.Refine.RefineVi
     label = super(display)
     label.updateLayout {
       right: 10
-      font: { fontSize: 15 }
+      font: { fontSize: 16 }
       width: 300
     }
     label
