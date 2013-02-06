@@ -4,28 +4,28 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       title: 'Refine'
       rowSelectedBackgroundColor: null
       rowValueColor: '#000'
-      # groups: [
-        # {
-          # properties: [
-            # {
-              # title: 'Section'                                # Name given to row
-              # field: 'PropertyClassID'                        # Property send back with result object
-              # value: 4                                        # Default/Set value
-              # data: [                                         # Options (Take and array of objects with label, value properties)
-                # { label: 'Option 1', value: 1 }
-                # { label: 'Option 2', value: 2 }
-                # { label: 'Option 3', value: 3 }
-                # { label: 'Option 4', value: 4 }
-                # { label: 'Option 5', value: 5 }
-              # ]
-              # mode: root.Refine.RefineSelectView.Mode.SINGLE  # SINGLE, MULTI (Defaults to SINGLE)
-              # conditionalProperty: 'MaxPrice'                 # Must be used with conditon method
-              # condition: (conditionalValue, value) ->         # Evaluate conditional value against set value to return true | false
-                # Ti.API.info('Evaluate')
-            # }
-          # ]
-        # }
-      # ]
+      groups: [
+        {
+          properties: [
+            {
+              title: 'Section'                                # Name given to row
+              field: 'PropertyClassID'                        # Property send back with result object
+              value: 4                                        # Default/Set value
+              data: [                                         # Options (Take and array of objects with label, value properties)
+                { label: 'Option 1', value: 1 }
+                { label: 'Option 2', value: 2 }
+                { label: 'Option 3', value: 3 }
+                { label: 'Option 4', value: 4 }
+                { label: 'Option 5', value: 5 }
+              ]
+              mode: root.Refine.RefineSelectView.Mode.SINGLE  # SINGLE, MULTI (Defaults to SINGLE)
+              conditionalProperty: 'MaxPrice'                 # Must be used with conditon method
+              condition: (conditionalValue, value) ->         # Evaluate conditional value against set value to return true | false
+                Ti.API.info('Evaluate')
+            }
+          ]
+        }
+      ]
       onReset: -> Ti.API.info 'root.Refine.RefineView.onReset'
       onRefine: -> Ti.API.info 'root.Refine.RefineView.onRefine'
       onCancel: -> Ti.API.info 'root.Refine.RefineView.onCancel'
@@ -67,9 +67,6 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       groupsSections.push section
     table.setData groupsSections
     
-    if @settings.getRefineButton?
-      table.setFooterView @createFooterView()
-    
     table
   
   createCancelButton: ->
@@ -77,13 +74,15 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   createResetButton: ->
     
   createFooterView: =>
-    container = Ti.UI.createView { height: Ti.UI.SIZE }
+    container = Ti.UI.createView { height: Ti.UI.SIZE, width: Ti.UI.FILL }
     button = @settings.getRefineButton()
     button.addEventListener('click', @refine)
     container.add button
     container
       
-  createTable: -> Ti.UI.createTableView()
+  createTable: => Ti.UI.createTableView {
+    footerView: @createFooterView()
+  }
   
   createGroupSection: ->
     Ti.UI.createTableViewSection {}
@@ -92,10 +91,8 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     row = Ti.UI.createTableViewRow {
       backgroundColor: '#fff'
       hasChild: true
+      selectedBackgroundColor: if @settings.rowSelectedBackgroundColor? then @settings.rowSelectedBackgroundColor else '#ccc'
     }
-    
-    if @settings.rowSelectedBackgroundColor?
-      row.setSelectedBackgroundColor @settings.rowSelectedBackgroundColor
     
     title = @createPropertyTitle(property.title)
     value = @createPropertyDisplay(@getPropertyDisplayLabel(property, property.value))
@@ -263,6 +260,6 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       })
     @refineSeletView.update(e.row.refineProperty)
     @inSelectView = true
-    @refineSeletView.settings.navigationGroup = @settings.navigationGroup
+    @refineSeletView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
     @refineSeletView.show()
     

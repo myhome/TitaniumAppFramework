@@ -7,6 +7,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
   
   constructor: (options = {}) ->
     super root._.extend {
+      style: 'brushedMetal'
       onChange: -> 'root.Refine.RefineSelectView: onChange'
       onConditionCheck: -> 'root.Refine.RefineSelectView: onConditionCheck'
     }, options
@@ -96,10 +97,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       
       if shouldAddRow
       
-        row = Ti.UI.createTableViewRow {
-          title: item.label
-          selectedBackgroundColor: @settings.rowSelectedBackgroundColor
-        }
+        row = @createTableRow(item.label)
         
         if @hasCheck(@property, item.value)
           row.setHasCheck true
@@ -114,6 +112,12 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
         rows.push row
     
     @table.setData rows
+  
+  createTableRow: (label) ->
+    Ti.UI.createTableViewRow {
+      title: label
+      selectedBackgroundColor: @settings.rowSelectedBackgroundColor
+    }
   
   isMulti: (property) -> property.mode is root.Refine.RefineSelectView.Mode.MULTI
   
