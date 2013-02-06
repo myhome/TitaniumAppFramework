@@ -101,7 +101,9 @@ root.BaseView = class BaseView
     Ti.API.info 'BaseView.onFocus'
     
   show: (options = {}) =>
-    if @settings.navGroup?
+    if @settings.navigationGroup?
+      @settings.navigationGroup.open(@window, options)
+    else if @settings.navGroup?
       @settings.navGroup.navGroup.open(@window, options)
     else if root.tabGroup?
       @window.inTabGroup = true
@@ -118,7 +120,9 @@ root.BaseView = class BaseView
     @window.open(options)
 
   close: (options = {}) =>
-    if @window.navGroup?
+    if @settings.navigationGroup?
+      @settings.navigationGroup.close(@window, options)
+    else if @window.navGroup?
       @window.navGroup.navGroup.close(@window, options)
     else if @window.inTabGroup
       root.tabGroup.tabs.activeTab.close(@window, options)
