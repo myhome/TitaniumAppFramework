@@ -117,7 +117,6 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     options = {
       title: label
       backgroundColor: '#fff'
-      hasChild: true
     }
     
     if @settings.rowSelectedBackgroundColor?
