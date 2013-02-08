@@ -114,10 +114,19 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     @table.setData rows
   
   createTableRow: (label) ->
-    Ti.UI.createTableViewRow {
+    options = {
       title: label
-      selectedBackgroundColor: @settings.rowSelectedBackgroundColor
+      backgroundColor: '#fff'
+      hasChild: true
     }
+    
+    if @settings.rowSelectedBackgroundColor?
+      root._.extend options , {
+        selectedBackgroundColor: @settings.rowSelectedBackgroundColor
+      }
+      
+    row = Ti.UI.createTableViewRow options
+    row
   
   isMulti: (property) -> property.mode is root.Refine.RefineSelectView.Mode.MULTI
   

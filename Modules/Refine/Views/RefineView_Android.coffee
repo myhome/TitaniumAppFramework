@@ -2,6 +2,7 @@ root.Refine.RefineView_Android = class RefineView_Android extends root.Refine.Re
   constructor: (options = {}) ->
     super root._.extend {
       navBarHidden: true
+      rowSelectedBackgroundColor: '#ccc'
     }, options
     
   onInit: =>

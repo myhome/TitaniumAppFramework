@@ -88,11 +88,17 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     Ti.UI.createTableViewSection {}
   
   createPropertyRow: (property) =>
-    row = Ti.UI.createTableViewRow {
+    options = {
       backgroundColor: '#fff'
       hasChild: true
-      selectedBackgroundColor: if @settings.rowSelectedBackgroundColor? then @settings.rowSelectedBackgroundColor else '#ccc'
     }
+    
+    if @settings.rowSelectedBackgroundColor?
+      root._.extend options , {
+        selectedBackgroundColor: @settings.rowSelectedBackgroundColor
+      }
+
+    row = Ti.UI.createTableViewRow options
     
     title = @createPropertyTitle(property.title)
     value = @createPropertyDisplay(@getPropertyDisplayLabel(property, property.value))

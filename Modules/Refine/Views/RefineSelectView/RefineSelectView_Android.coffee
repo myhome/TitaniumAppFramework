@@ -2,6 +2,7 @@ root.Refine.RefineSelectView_Android = class RefineSelectView_Android extends ro
   constructor: (options = {}) ->
     super root._.extend {
       navBarHidden: true
+      rowSelectedBackgroundColor: '#ccc'
     }, options
   
   onInit: =>
@@ -42,7 +43,7 @@ root.Refine.RefineSelectView_Android = class RefineSelectView_Android extends ro
       font: { fontSize: '15dp', fontWeight: 'bold' }
       color: '#000'
       backgroundColor: '#fff'
-      backgroundSelectedColor: if @settings.rowSelectedBackgroundColor? then @settings.rowSelectedBackgroundColor else '#ccc'
+      backgroundSelectedColor: @settings.rowSelectedBackgroundColor
     }
 
   ############################################################
