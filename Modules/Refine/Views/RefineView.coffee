@@ -138,7 +138,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   createPropertyCheckbox: (value) =>
     Ti.UI.createSwitch {
       right: 10
-      value: value
+      value: if value then value else false
     }
   
   createTableRow: ->
@@ -172,7 +172,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         propertyRow.checkboxControl.removeEventListener('change', (e) => @onChange { field: propertyRow.refineProperty.field, value: e.value }) if propertyRow.active
         propertyRow.active = false
       else
-        propertyRow.titleControl.color = '#ccc'
+        propertyRow.titleControl.color = '#000'
         propertyRow.removeEventListener('click', @onRowClicked) if propertyRow.active
         propertyRow.active = false
     else
