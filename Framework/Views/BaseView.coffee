@@ -74,7 +74,7 @@ root.BaseView = class BaseView
        #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
 
   focus: (e) =>
-    Ti.API.info 'BaseView.focus'
+    #Ti.API.info 'BaseView.focus'
     @onInit() if !@uiInitialised
     @onFocus()
     @uiInitialised = true
@@ -98,7 +98,7 @@ root.BaseView = class BaseView
       @onLandscape()
       
   onFocus: ->
-    Ti.API.info 'BaseView.onFocus'
+    #Ti.API.info 'BaseView.onFocus'
     
   show: (options = {}) =>
     if @settings.navigationGroup?

@@ -51,8 +51,6 @@ root.SearchResultsTable_Framework = class SearchResultsTable_Framework
     alert 'SearchResultsTable_Framework.addScrollListener: Abstract override'
     
   update: (items, hasMoreRows, enableAds = false, adData = {}) =>
-    Ti.API.info("----- Updating SearchResultsTable -----")
-    
     @scrollingEnabled true
 
     if items.length > 0
@@ -79,8 +77,6 @@ root.SearchResultsTable_Framework = class SearchResultsTable_Framework
     else
       @table.hasMoreRows = false
     
-    Ti.API.info("-- Finished Updating SearchResultsTable --")
-
   scrollingEnabled: (enabled) =>
 
   clear: =>
