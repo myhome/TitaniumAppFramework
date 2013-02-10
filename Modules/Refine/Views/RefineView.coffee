@@ -168,16 +168,16 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   updatePropertyRowStatus: (propertyRow, dependencyMissing) =>
     if dependencyMissing
       if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
-        propertyRow.checkboxControl.setEnabled = false
+        propertyRow.checkboxControl.setEnabled false
         propertyRow.checkboxControl.removeEventListener('change', (e) => @onChange { field: propertyRow.refineProperty.field, value: e.value }) if propertyRow.active
         propertyRow.active = false
       else
-        propertyRow.titleControl.color = '#000'
+        propertyRow.titleControl.color = '#CCC'
         propertyRow.removeEventListener('click', @onRowClicked) if propertyRow.active
         propertyRow.active = false
     else
       if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
-        propertyRow.checkboxControl.setEnabled = true
+        propertyRow.checkboxControl.setEnabled true
         propertyRow.checkboxControl.addEventListener('change', (e) => @onChange { field: propertyRow.refineProperty.field, value: e.value }) if !propertyRow.active
         propertyRow.active = true
       else
@@ -217,7 +217,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         row.refineProperty = root._.extend row.refineProperty, { value: value }
         
         if row.refineProperty.type? and row.refineProperty.type is 2
-          row.checkboxControl.setValue row.refineProperty.value
+          row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
         else
           row.displayControl.setText @getDisplay(row.refineProperty)
     
@@ -246,7 +246,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
           
         if propertyRow?
           if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
-            propertyRow.checkboxControl.setValue propertyRow.refineProperty.originalValue
+            propertyRow.checkboxControl.setValue if propertyRow.refineProperty.originalValue then propertyRow.refineProperty.originalValue else false
           else
             propertyRow.displayControl.setText obj.originalLabel
           propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: obj.originalValue }
@@ -276,14 +276,14 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       }
       
       if row.refineProperty.type? and row.refineProperty.type is 2
-        row.checkboxControl.setValue row.refineProperty.value
+        row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
       else
         row.displayControl.setText @getDisplay(row.refineProperty)
       delete @changeHistory[row.refineProperty.field]
     
     propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: change.value }
     if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
-      propertyRow.checkboxControl.setValue propertyRow.refineProperty.value
+      propertyRow.checkboxControl.setValue if propertyRow.refineProperty.value then propertyRow.refineProperty.value else false
     else
       propertyRow.displayControl.setText @getDisplay(propertyRow.refineProperty)
   
