@@ -8,6 +8,7 @@ root.TwoLineTitle_Framework_iOS = class TwoLineTitle_Framework_iOS extends root.
     title.updateLayout { 
       shadowColor: '#222'
       shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
     }
     title.setMinimumFontSize 13
     
@@ -18,6 +19,7 @@ root.TwoLineTitle_Framework_iOS = class TwoLineTitle_Framework_iOS extends root.
     subTitle.updateLayout { 
       shadowColor: '#222'
       shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
     }
     
     subTitle
@@ -27,6 +29,7 @@ root.TwoLineTitle_Framework_iOS = class TwoLineTitle_Framework_iOS extends root.
     bigTitle.updateLayout { 
       shadowColor: '#222'
       shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
     }
     bigTitle.setMinimumFontSize 15
     
