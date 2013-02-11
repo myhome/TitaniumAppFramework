@@ -11,6 +11,12 @@ root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.Refi
       headerView: Ti.UI.createView { height: 1 }
     }
   
+  createPropertyRow: (property) =>
+    row = super(property)
+    if property.type is 2
+      row.setSelectionStyle Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+    row
+  
   createPropertyTitle: (title) ->
     label = super(title)
     label.updateLayout {
