@@ -1,6 +1,6 @@
 root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework extends root.BaseView
   constructor:(options = {}) ->
-    super options
+    super root._.extend {}, options
     
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
       @loadingView = Ti.UI.createView {
@@ -18,15 +18,13 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
         style: Ti.UI.iPhone.ActivityIndicatorStyle.LIGHT
       }
       
-      label = Ti.UI.createLabel {
+      @loadingView.add @activityIndicator
+      @loadingView.add Ti.UI.createLabel {
         bottom: 20
         text: 'Loading'
         color: '#fff'
         font: { fontSize: 15, fontWeight: 'bold' }
       }
-
-      @loadingView.add @activityIndicator
-      @loadingView.add label
       @activityIndicator.show()
       
       @add(@loadingView)
@@ -40,6 +38,9 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
       })
       @add(@activityIndicator)
   
+  ########################################################################
+  ## METHODS #############################################################
+  
   showLoadingIndicator: =>
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
       @loadingView.show()
@@ -51,3 +52,14 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
       @loadingView.hide()
     else
       @activityIndicator.hide()
+  
+  dispose: =>
+    if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
+      @loadingView.remove @activityIndicator if @activityIndicator?
+      @activityIndicator = null
+      @remove @loadingView if @loadingView?
+      @loadingView = null
+    else
+      @remove @activityIndicator if @activityIndicator?
+      @activityIndicator = null
+    super

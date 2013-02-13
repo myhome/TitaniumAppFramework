@@ -10,6 +10,7 @@ root.BaseView = class BaseView
       viewTitleBarStyle: root.app.settings.viewTitleBarStyle
       useImageButtons: root.app.settings.useImageButtons
       orientationModes: root.app.settings.defaultOrientationModes
+      disposeOnClose: false
     }, options)
     @applyStyle()
     
@@ -119,7 +120,7 @@ root.BaseView = class BaseView
     options = root._.extend({}, options)
     @window.open(options)
 
-  close: (options = {}) =>
+  close: (options = { animated : true }) =>
     if @settings.navigationGroup?
       @settings.navigationGroup.close(@window, options)
     else if @window.navGroup?
@@ -132,10 +133,16 @@ root.BaseView = class BaseView
       @window.close(options)
     @isOpen = false
       
-  onClose: ->
+  onClose: =>
+    @dispose() if @settings.disposeOnClose
     
   onBlur: ->
   
+  dispose: =>    
+    @clear()
+    @content = null
+    @window = null
+      
   add: (control) ->
     @content.add control
     @controls.push control
