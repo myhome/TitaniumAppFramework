@@ -7,12 +7,14 @@ root.SearchTable_Framework = class SearchTable_Framework
       pullToRefresh: false
       pullToRefreshCallback: -> Ti.API.info 'SearchTable_Framework.pullToRefreshCallback'
       infiniteScroll: false
-      inifiniteScrollCallback: -> Ti.API.info 'SearchTable_Framework.inifiniteScrollCallback'
+      infiniteScrollCallback: -> Ti.API.info 'SearchTable_Framework.inifiniteScrollCallback'
     }, options
     
     @pulling = false
     @reloading = false
     @offset = 0
+    @lastDistance = 0
+    @hasMoreRows = false
     
     @table = @createTable(@settings)
     
@@ -20,26 +22,26 @@ root.SearchTable_Framework = class SearchTable_Framework
   ########################################################################
   
   createTable: (options) =>
-    if options.pullToRefresh
-      options = root._.extend options, {
-        headerPullView: @createPullView()
-      }
-    
     table = Ti.UI.createTableView options
     table.addEventListener('click', options.onTableClick)
-    
+    table.addEventListener('scroll', @onScroll)
+    table.addEventListener('dragend', @onDragend)
+      
     if options.pullToRefresh
-      table.addEventListener('scroll', @onScroll)
-      table.addEventListener('dragend', @onDragend)
+      table.setHeaderPullView @createPullView()
+    
+    if options.infiniteScroll
+      @lastDistance = 0
+      table.setFooterView @createFooterView()
     
     table
   
   createPullView: ->
-    @view = Ti.UI.createView {
+    @headerView = Ti.UI.createView {
       width: 320, height: 60
       backgroundColor: '#bac5d3'
     }
-    @view.add Ti.UI.createView {
+    @headerView.add Ti.UI.createView {
       backgroundColor: '#91a3bc'
       bottom: 0
       height: 1
@@ -49,7 +51,7 @@ root.SearchTable_Framework = class SearchTable_Framework
         left: 20, bottom: 10
         width: 23, height: 60
     }
-    @actInd = Ti.UI.createActivityIndicator {
+    @headerLoader = Ti.UI.createActivityIndicator {
         left: 20, bottom: 25
         width: 30, height: 30
     }
@@ -59,10 +61,27 @@ root.SearchTable_Framework = class SearchTable_Framework
       textAlign: 'center'
       width: 200
     }
-    @view.add @imageArrow
-    @view.add @actInd
-    @view.add @pullLabel
-    @view
+    @headerView.add @imageArrow
+    @headerView.add @headerLoader
+    @headerView.add @pullLabel
+    @headerView
+  
+  createFooterView: ->
+    @footerView = Ti.UI.createView {
+      backgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray.png')
+      backgroundLeftCap: 1
+      backgroundTopCap: 1
+      height: 40
+      visible: false
+      
+    }
+    @footerLoader = Ti.UI.createActivityIndicator {
+      width: 30, height: 30
+      style: Ti.UI.iPhone.ActivityIndicatorStyle.DARK
+    }
+    @footerLoader.show()
+    @footerView.add @footerLoader
+    @footerView
   
   createTableRow: (data) ->
     row = Ti.UI.createTableViewRow {
@@ -82,7 +101,7 @@ root.SearchTable_Framework = class SearchTable_Framework
   clear: =>
     @table.setData []
   
-  update: (data, toTop = false) =>
+  update: (data, hasMoreRows = false, toTop = false) =>
     if toTop
       for item in data by -1
         row = @createTableRow(item)
@@ -92,7 +111,11 @@ root.SearchTable_Framework = class SearchTable_Framework
       for item in data
         row = @createTableRow(item)
         rows.push row
-      @table.setData rows
+      @table.appendRow rows
+      
+      if @settings.infiniteScroll
+        @hasMoreRows = hasMoreRows
+        @footerView.hide()
   
   show: =>
     @table.show()
@@ -102,46 +125,63 @@ root.SearchTable_Framework = class SearchTable_Framework
   
   resetPullHeader: (table) ->
     @reloading = false
-    @actInd.hide()
+    @headerLoader.hide()
     @imageArrow.transform = Ti.UI.create2DMatrix()
     @imageArrow.show()
     @pullLabel.setText 'Pull down to refresh...'
     table.setContentInsets { top: 0 }, { animated: true }
   
   dispose: =>
-    @view.remove @imageArrow if @imageArrow?
-    @imageArrow = null
-    @view.remove @actInd if @actInd?
-    @actInd = null
-    @view.remove @pullLabel if @pullLabel?
-    @pullLabel = null
+    if @headerView?
+      @headerView.remove @imageArrow
+      @imageArrow = null
+      @headerView.remove @headerLoader
+      @headerLoader = null
+      @headerView.remove @pullLabel
+      @pullLabel = null
+    if @footerView?
+      @footerView.remove @footerLoader
+      @footerLoader = null
    
   ## EVENTS ##############################################################
   ########################################################################
   
   onScroll: (e) =>
     @offset = e.contentOffset.y;
-    if @pulling and !@reloading and @offset > -80 and @offset < 0
-      @pulling = false
-      unrotate = Ti.UI.create2DMatrix()
-      @imageArrow.animate { transform: unrotate, duration: 180 }
-      @pullLabel.setText 'Pull down to refresh...'
-    else if !@pulling and !@reloading and @offset < -80
-      @pulling = true
-      rotate = Ti.UI.create2DMatrix().rotate(180)
-      @imageArrow.animate { transform: rotate, duration: 180 }
-      @pullLabel.setText 'Release to refresh...';
+    if @settings.pullToRefresh
+      if @pulling and !@reloading and @offset > -80 and @offset < 0
+        @pulling = false
+        unrotate = Ti.UI.create2DMatrix()
+        @imageArrow.animate { transform: unrotate, duration: 180 }
+        @pullLabel.setText 'Pull down to refresh...'
+      else if !@pulling and !@reloading and @offset < -80
+        @pulling = true
+        rotate = Ti.UI.create2DMatrix().rotate(180)
+        @imageArrow.animate { transform: rotate, duration: 180 }
+        @pullLabel.setText 'Release to refresh...';
+      
+    if @settings.infiniteScroll
+      height = e.size.height
+      total = @offset + height
+      theEnd = e.contentSize.height
+      distance = theEnd - total
+      if distance < @lastDistance
+        if (total >= theEnd) && e.contentSize.height > e.size.height && @hasMoreRows
+          @settings.infiniteScrollCallback()
+          @footerView.show()
+      @lastDistance = distance
 
   onDragend: (e) =>
-    if @pulling and !@reloading and @offset < -80
-      @pulling = false
-      @reloading = true
-      @pullLabel.text = 'Updating...'
-      @imageArrow.hide()
-      @actInd.show()
-      e.source.setContentInsets { top: 80 }, { animated: true }
-      
-      setTimeout ( =>
-        @settings.pullToRefreshCallback( => @resetPullHeader(@table))
-      ), 1500
+    if @settings.pullToRefresh
+      if @pulling and !@reloading and @offset < -80
+        @pulling = false
+        @reloading = true
+        @pullLabel.text = 'Updating...'
+        @imageArrow.hide()
+        @headerLoader.show()
+        e.source.setContentInsets { top: 80 }, { animated: true }
+        
+        setTimeout ( =>
+          @settings.pullToRefreshCallback( => @resetPullHeader(@table))
+        ), 1500
       
