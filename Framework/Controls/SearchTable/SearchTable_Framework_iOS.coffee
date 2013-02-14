@@ -12,6 +12,14 @@ root.SearchTable_Framework_iOS = class SearchTable_Framework_iOS extends root.Se
     }
     table
   
+  createTableRow: (data) ->
+    row = super(data)
+    row.applyProperties {
+      backgroundLeftCap: 1
+      backgroundTopCap: 1
+    }
+    row
+  
   ## METHODS #############################################################
   ########################################################################
   
