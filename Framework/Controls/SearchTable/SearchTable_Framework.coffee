@@ -85,6 +85,7 @@ root.SearchTable_Framework = class SearchTable_Framework
   
   createTableRow: (data) ->
     row = Ti.UI.createTableViewRow {
+      height: 86
       className: data.className
       backgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray.png')
       selectedBackgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray-selected.png')
@@ -102,20 +103,18 @@ root.SearchTable_Framework = class SearchTable_Framework
   update: (data, hasMoreRows = false, toTop = false) =>
     if toTop
       for item in data by -1
-        row = @createTableRow(item)
-        @table.insertRowBefore 0, row
+        @table.insertRowBefore 0, item
         @rowCount++
     else
       if @rowCount is 0
         rows = []
         for item in data
-          row = @createTableRow(item)
-          rows.push row
+          rows.push item
           @rowCount++
-        @table.appendRow rows, { animated: false }
+        @table.setData rows
       else
         for item in data
-          @table.appendRow @createTableRow(item), { animated: false }
+          @table.appendRow item, { animated: false }
           @rowCount++
       
       if @settings.infiniteScroll
