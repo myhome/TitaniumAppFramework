@@ -13,9 +13,9 @@ root.SearchTable_Framework = class SearchTable_Framework
     @pulling = false
     @reloading = false
     @offset = 0
-    @lastDistance = 0
+    @lastDistance = 200
     @hasMoreRows = false
-    
+    @rowCount = 0
     @table = @createTable(@settings)
     
   ## UI ##################################################################
@@ -88,8 +88,6 @@ root.SearchTable_Framework = class SearchTable_Framework
       className: data.className
       backgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray.png')
       selectedBackgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray-selected.png')
-      backgroundLeftCap: 1
-      backgroundTopCap: 1
     }
     row.id = data.id
     row.add data.view
@@ -105,13 +103,20 @@ root.SearchTable_Framework = class SearchTable_Framework
     if toTop
       for item in data by -1
         row = @createTableRow(item)
-        @table.insertRowBefore(0, row)
+        @table.insertRowBefore 0, row
+        @rowCount++
     else
-      rows = []
-      for item in data
-        row = @createTableRow(item)
-        rows.push row
-      @table.appendRow rows
+      if @rowCount is 0
+        rows = []
+        for item in data
+          row = @createTableRow(item)
+          rows.push row
+          @rowCount++
+        @table.appendRow rows, { animated: false }
+      else
+        for item in data
+          @table.appendRow @createTableRow(item), { animated: false }
+          @rowCount++
       
       if @settings.infiniteScroll
         @hasMoreRows = hasMoreRows
