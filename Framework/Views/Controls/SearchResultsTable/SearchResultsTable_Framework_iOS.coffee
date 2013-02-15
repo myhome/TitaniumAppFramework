@@ -31,6 +31,13 @@ root.SearchResultsTable_Framework_iOS = class SearchResultsTable_Framework_iOS e
           @table.setContentInsets({ top: 50 }, { animated: true })
           @options.pullToRefreshCallback(e)
       )
+  
+  createTableView: =>
+    table = super
+    table.applyProperties {
+      separatorStyle: Titanium.UI.iPhone.TableViewSeparatorStyle.NONE
+    }
+    table
     
   resetPullHeader: ->
     @reloading = false
