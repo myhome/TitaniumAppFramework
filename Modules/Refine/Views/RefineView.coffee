@@ -90,7 +90,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   createPropertyRow: (property) =>
     options = {
       backgroundColor: '#fff'
-      hasChild: (property.type? and property.type is 1)
+      hasChild: ((property.type? and property.type is 1) or !property.type?)
     }
     
     if @settings.rowSelectedBackgroundColor?
