@@ -108,7 +108,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       row.add checkbox
       row.checkboxControl = checkbox
     else
-      value = @createPropertyDisplay(@getPropertyDisplayLabel(property, property.value))
+      value = @createPropertyDisplay(@getDisplay(property))
       row.add value
       row.displayControl = value
     
