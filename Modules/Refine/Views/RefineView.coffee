@@ -41,7 +41,6 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     
     @add @build()
     @createCancelButton()
-    @createResetButton()
   
   ############################################################
   ### UI #####################################################
@@ -70,18 +69,18 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     table
   
   createCancelButton: ->
+    
+  createHeaderView: =>
+    Ti.UI.createView()
   
   createResetButton: ->
+    Ti.UI.createView()
     
-  createFooterView: =>
-    container = Ti.UI.createView { height: Ti.UI.SIZE, width: Ti.UI.FILL }
-    button = @settings.getRefineButton()
-    button.addEventListener('click', @refine)
-    container.add button
-    container
+  createRefineButton: ->
+    Ti.UI.createView()
       
   createTable: => Ti.UI.createTableView {
-    footerView: @createFooterView()
+    headerView: @createHeaderView()
   }
   
   createGroupSection: ->

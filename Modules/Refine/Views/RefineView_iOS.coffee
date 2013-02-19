@@ -21,13 +21,6 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
     })
     @window.leftNavButton = cancelButton.view
   
-  createResetButton: =>
-    resetButton = root.app.create("ImageButton", {
-      text: "Reset"
-      onClick: @reset
-    })
-    @window.RightNavButton = resetButton.view
-  
   createTable: ->
     table = super
     table.updateLayout {
@@ -40,6 +33,50 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
     row = super(property)
     row.setHeight 44
     row
+  
+  createHeaderView: =>
+    container = Ti.UI.createView { height: 64, width: Ti.UI.FILL }
+    container.add @createResetButton()
+    container.add @createRefineButton()
+    container
+  
+  createResetButton: =>
+    root.app.create('Button', {
+      text: "Reset"
+      fontSize: 15
+      width: 145, height: 44
+      left: 10, top: 10
+      style:{
+        gradient: ["#dfdfdf", "#a1a1a1"]
+        borderColor: '#aaaaaa'
+        labelShadowColor: "#000"
+      }
+      onClickStyle: {
+        gradient: ["#dfdfdf", "#a1a1a1"]
+        borderColor: '#888888'
+        labelShadowColor: "#000"
+      }
+      onClick: @reset
+    }).view
+    
+  createRefineButton: ->
+    root.app.create('Button', {
+      text: "Refine"
+      fontSize: 15
+      width: 145, height: 44
+      right: 10, top: 10
+      style:{
+        gradient: ["#0082cc", "#0045cc"]
+        borderColor: '#0062b8'
+        labelShadowColor: "#000"
+      }
+      onClickStyle: {
+        gradient: ["#0082cc", "#0045cc"]
+        borderColor: '#0062b8'
+        labelShadowColor: "#000"
+      }
+      onClick: @refine
+    }).view
   
   ############################################################
   ### METHODS ################################################
