@@ -290,7 +290,9 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     if !@refineSeletView?
       @refineSeletView = root.app.create('Refine.RefineSelectView', {
         getTitleLabel: @settings.getTitleLabel
-        barImage: @settings.barImage
+        viewTitleBarStyle: @settings.viewTitleBarStyle
+        barColor: @settings.barColor
+        fontThemeColor: @settings.fontThemeColor
         rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
         onChange: @onChange
         onPropertyFetch: (field) =>
