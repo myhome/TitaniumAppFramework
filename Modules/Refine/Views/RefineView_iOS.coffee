@@ -66,13 +66,13 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
       width: 145, height: 44
       right: 10, top: 10
       style:{
-        gradient: ["#0082cc", "#0045cc"]
-        borderColor: '#0062b8'
+        gradient: ["#444", "#222"]
+        borderColor: '#111'
         labelShadowColor: "#000"
       }
       onClickStyle: {
-        gradient: ["#0082cc", "#0045cc"]
-        borderColor: '#0062b8'
+        gradient: ["#444", "#222"]
+        borderColor: '#111'
         labelShadowColor: "#000"
       }
       onClick: @refine

@@ -76,12 +76,10 @@ root.Refine.RefineView_Android = class RefineView_Android extends root.Refine.Re
       width: '145dp', height: '44dp'
       right: '10dp', top: '10dp'
       style:{
-        gradient: ["#0082cc", "#0045cc"]
-        labelShadowColor: "#000"
+        gradient: ["#444", "#222"]
       }
       onClickStyle: {
-        gradient: ["#0082cc", "#0045cc"]
-        labelShadowColor: "#000"
+        gradient: ["#444", "#222"]
       }
       onClick: @refine
     }).view
