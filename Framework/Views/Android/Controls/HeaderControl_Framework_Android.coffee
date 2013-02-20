@@ -7,7 +7,7 @@ root.HeaderControl_Framework_Android = class HeaderControl_Framework_Android
     @view = Ti.UI.createView {
       top: 0
       width: "100%", height: @options.height
-      backgroundGradient: @options.backgroundGradient
+      backgroundColor: @options.backgroundColor
     }
     
     @centerView = Ti.UI.createView {
