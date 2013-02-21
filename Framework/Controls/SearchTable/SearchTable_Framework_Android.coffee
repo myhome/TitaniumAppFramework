@@ -2,8 +2,36 @@ root.SearchTable_Framework_Android = class SearchTable_Framework_Android extends
   constructor: (options = {}) ->
     super root._.extend {}, options
     
+    @showingPullView = false
+    
   ## UI ##################################################################
   ########################################################################
+  
+  createTable: (options) =>
+    table = Ti.UI.createTableView options
+    table.addEventListener('scroll', @onScroll)
+    table.addEventListener('dragend', @onDragend)
+      
+    if options.infiniteScroll
+      @lastDistance = 0
+      table.setFooterView @createFooterView()
+    
+    table
+  
+  createFooterView: ->
+    view = super
+    view.applyProperties {
+      backgroundColor: '#f2f2f2'
+      width: Ti.UI.FILL, height: '50dp'
+    }
+    view
+  createFooterViewLoader: ->
+    activityIndicator = super
+    activityIndicator.applyProperties {
+      width: '40dp', height: '40dp'
+      style: Ti.UI.ActivityIndicatorStyle.DARK
+    }
+    activityIndicator
   
   ## METHODS #############################################################
   ########################################################################
@@ -11,4 +39,8 @@ root.SearchTable_Framework_Android = class SearchTable_Framework_Android extends
   ## EVENTS ##############################################################
   ########################################################################
   
+  onScroll: (e) =>
+    if e.totalItemCount > e.visibleItemCount && e.firstVisibleItem + e.visibleItemCount == e.totalItemCount && @hasMoreRows
+      @settings.infiniteScrollCallback()
+      @footerView.show()
   

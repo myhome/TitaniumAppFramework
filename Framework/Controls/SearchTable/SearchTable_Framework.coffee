@@ -3,7 +3,6 @@ root.SearchTable_Framework = class SearchTable_Framework
     @settings = root._.extend {
       backgroundColor: 'transparent'
       separatorColor: 'transparent'
-      onTableClick: -> Ti.API.info 'SearchTable_Framework.onTableClick'
       pullToRefresh: false
       pullToRefreshCallback: -> Ti.API.info 'SearchTable_Framework.pullToRefreshCallback'
       infiniteScroll: false
@@ -23,7 +22,6 @@ root.SearchTable_Framework = class SearchTable_Framework
   
   createTable: (options) =>
     table = Ti.UI.createTableView options
-    table.addEventListener('click', options.onTableClick)
     table.addEventListener('scroll', @onScroll)
     table.addEventListener('dragend', @onDragend)
       
@@ -38,61 +36,46 @@ root.SearchTable_Framework = class SearchTable_Framework
   
   createPullView: ->
     @headerView = Ti.UI.createView {
-      width: 320, height: 60
       backgroundColor: '#bac5d3'
     }
-    @headerView.add Ti.UI.createView {
-      backgroundColor: '#91a3bc'
-      bottom: 0
-      height: 1
-    }
-    @imageArrow = Ti.UI.createImageView {
-        image: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/whiteArrow.png')
-        left: 20, bottom: 10
-        width: 23, height: 60
-    }
-    @headerLoader = Ti.UI.createActivityIndicator {
-        left: 20, bottom: 25
-        width: 30, height: 30
-    }
-    @pullLabel = Ti.UI.createLabel {
-      left: 55, bottom: 30
-      text: 'Pull down to refresh...', color: '#576c89', font: { fontSize: 13, fontWeight: 'bold' }, shadowColor: '#fff', shadowOffset: { x: 0, y: 1 }
-      textAlign: 'center'
-      width: 200
-    }
+    @headerView.add @createPullViewBottomBorder()
+    @imageArrow = @createPullViewArrow()
+    @headerLoader = @createPullViewLoader()
+    @pullLabel = @createPullViewLabel()
+    
     @headerView.add @imageArrow
     @headerView.add @headerLoader
     @headerView.add @pullLabel
     @headerView
   
+  createPullViewBottomBorder: ->
+    Ti.UI.createView {
+      backgroundColor: '#91a3bc'
+      bottom: 0
+      height: 1
+    }
+  createPullViewArrow: ->
+    Ti.UI.createImageView {
+      image: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/whiteArrow.png')
+    }
+  createPullViewLoader: ->
+    Ti.UI.createActivityIndicator()
+  createPullViewLabel: ->
+    Ti.UI.createLabel {
+      text: 'Pull down to refresh...', color: '#576c89'
+      textAlign: 'center'
+    }
+  
   createFooterView: ->
     @footerView = Ti.UI.createView {
-      backgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray.png')
-      backgroundLeftCap: 1
-      backgroundTopCap: 1
-      height: 40
       visible: false
-      
     }
-    @footerLoader = Ti.UI.createActivityIndicator {
-      width: 30, height: 30
-      style: Ti.UI.iPhone.ActivityIndicatorStyle.DARK
-    }
+    @footerLoader = @createFooterViewLoader()
     @footerLoader.show()
     @footerView.add @footerLoader
     @footerView
-  
-  createTableRow: (data) ->
-    row = Ti.UI.createTableViewRow {
-      height: 86
-      className: data.className
-      backgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray.png')
-      selectedBackgroundImage: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/gray-selected.png')
-    }
-    row.id = data.id
-    row.add data.view
-    row
+  createFooterViewLoader: ->
+    Ti.UI.createActivityIndicator()
   
   ## METHODS #############################################################
   ########################################################################
@@ -151,41 +134,5 @@ root.SearchTable_Framework = class SearchTable_Framework
   ########################################################################
   
   onScroll: (e) =>
-    @offset = e.contentOffset.y;
-    if @settings.pullToRefresh
-      if @pulling and !@reloading and @offset > -80 and @offset < 0
-        @pulling = false
-        unrotate = Ti.UI.create2DMatrix()
-        @imageArrow.animate { transform: unrotate, duration: 180 }
-        @pullLabel.setText 'Pull down to refresh...'
-      else if !@pulling and !@reloading and @offset < -80
-        @pulling = true
-        rotate = Ti.UI.create2DMatrix().rotate(180)
-        @imageArrow.animate { transform: rotate, duration: 180 }
-        @pullLabel.setText 'Release to refresh...';
-      
-    if @settings.infiniteScroll
-      height = e.size.height
-      total = @offset + height
-      theEnd = e.contentSize.height
-      distance = theEnd - total
-      if distance < @lastDistance
-        if (total >= theEnd) && e.contentSize.height > e.size.height && @hasMoreRows
-          @settings.infiniteScrollCallback()
-          @footerView.show()
-      @lastDistance = distance
 
   onDragend: (e) =>
-    if @settings.pullToRefresh
-      if @pulling and !@reloading and @offset < -80
-        @pulling = false
-        @reloading = true
-        @pullLabel.text = 'Updating...'
-        @imageArrow.hide()
-        @headerLoader.show()
-        e.source.setContentInsets { top: 80 }, { animated: true }
-        
-        setTimeout ( =>
-          @settings.pullToRefreshCallback( => @resetPullHeader(@table))
-        ), 1500
-      
