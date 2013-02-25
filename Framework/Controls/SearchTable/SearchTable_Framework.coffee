@@ -37,7 +37,7 @@ root.SearchTable_Framework = class SearchTable_Framework
     
     table
   
-  createNoResultsView: ->
+  createNoResultsView: =>
     view = Ti.UI.createView {
       width: Ti.UI.FILL, height: Ti.UI.FILL
       backgroundColor: '#f8f8f8'
@@ -157,15 +157,22 @@ root.SearchTable_Framework = class SearchTable_Framework
     table.setContentInsets { top: 0 }, { animated: true }
   
   dispose: =>
+    @clear()
+    
+    for view in @table.getChildren()
+      @table.remove view
+    @noResultsView = null
+    
     if @headerView?
-      @headerView.remove @imageArrow
+      @headerView.remove @imageArrow if @imageArrow?
       @imageArrow = null
-      @headerView.remove @headerLoader
+      @headerView.remove @headerLoader if @headerLoader?
       @headerLoader = null
-      @headerView.remove @pullLabel
+      @headerView.remove @pullLabel if @pullLabel?
       @pullLabel = null
+      
     if @footerView?
-      @footerView.remove @footerLoader
+      @footerView.remove @footerLoader if @footerLoader?
       @footerLoader = null
    
   ## EVENTS ##############################################################

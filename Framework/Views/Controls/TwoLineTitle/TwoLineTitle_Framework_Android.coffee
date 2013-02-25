@@ -1,30 +1,40 @@
 root.TwoLineTitle_Framework_Android = class TwoLineTitle_Framework_Android extends root.TwoLineTitle_Framework
   constructor: (options = {}) ->
-    options = root._.extend {}, options
-    super options
-    
-    @view.setWidth '70%'
+    super root._.extend {}, options
+  
+  ## UI ##################################################################
+  ########################################################################
+  
+  createView: ->
+    view = super
+    view.setWidth '70%'
+    view
     
   createTitle: =>
-    title = super()
-    title.setTop '5dp'
-    title.setHeight '20dp'
-    title.setFont { fontSize: '15dp' }
-    title.setEllipsize true
-    title
+    label = super()
+    label.applyProperties {
+      top: '5dp'
+      height: '20dp'
+      font: { fontSize: '15dp' }
+      ellipsize: true
+    }
+    label
     
   createSubTitle: =>
-    subTitle = super()
-    subTitle.setTop '25dp'
-    subTitle.setHeight '20dp'
-    subTitle.setFont { fontSize: '13dp' }
-    subTitle.setEllipsize true
-    subTitle
+    label = super()
+    label.applyProperties {
+      top: '25dp'
+      height: '20dp'
+      font: { fontSize: '13dp' }
+      ellipsize: true
+    }
+    label
   
   createBigTitle: =>
-    bigTitle = super()
-    bigTitle.setHeight 'auto'
-    bigTitle.setFont { fontSize: '17dp' }
-    bigTitle.setEllipsize true
-    
-    bigTitle
+    label = super()
+    label.applyProperties {
+      top: 'auto'
+      font: { fontSize: '17dp' }
+      ellipsize: true
+    }
+    label
