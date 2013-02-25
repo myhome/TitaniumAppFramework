@@ -55,7 +55,6 @@ root.SearchTable_Framework = class SearchTable_Framework
     }
   createNoResultsViewImage: ->
     Ti.UI.createImageView {
-      width: 100, height: 100
       image: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/no-results.png')
     }
   createNoResultsViewLabel: ->

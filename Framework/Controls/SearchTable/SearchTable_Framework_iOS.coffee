@@ -14,9 +14,16 @@ root.SearchTable_Framework_iOS = class SearchTable_Framework_iOS extends root.Se
       borderRadius: 10
     }
     view
+  createNoResultsViewImage: ->
+    imageView = super
+    imageView.applyProperties {
+      width: 100, height: 100
+    }
+    imageView
   createNoResultsViewLabel: ->
     label = super
     label.applyProperties {
+      top: 20, font: { fontSize: 18 }
       shadowColor: '#fff', shadowOffset: { x: 0, y: 1 }
     }
     label

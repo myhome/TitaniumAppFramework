@@ -7,6 +7,19 @@ root.SearchTable_Framework_Android = class SearchTable_Framework_Android extends
   ## UI ##################################################################
   ########################################################################
   
+  createNoResultsView: ->
+    view = super
+    view.applyProperties {
+      left: '20dp', top: '20dp', right: '20dp', bottom: '20dp'
+    }
+    view
+  createNoResultsViewImage: ->
+    imageView = super
+    imageView.applyProperties {
+      width: '100dp', height: '100dp'
+    }
+    imageView
+    
   createTable: (options) =>
     table = Ti.UI.createTableView options
     table.addEventListener('scroll', @onScroll)
