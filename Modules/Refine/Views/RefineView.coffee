@@ -39,6 +39,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     @propertyRows = {}
     @changeHistory = {}
     @resetProperties = {}
+    @inSelectView = false
     
     @add @build()
     @createCancelButton()
@@ -267,6 +268,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   
   onFocus: =>
     super
+    @inSelectView = false
     @refreshDependencies()
   
   onChange: (change) => # { field: 'name', value: [value] }
@@ -299,8 +301,10 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       propertyRow.displayControl.setText @getDisplay(propertyRow.refineProperty)
   
   onRowClicked: (e) =>
-    if !@refineSeletView?
-      @refineSeletView = root.app.create('Refine.RefineSelectView', {
+    if !@inSelectView
+      Ti.API.info '------------- CLICK -------------'
+      @inSelectView = true
+      refineSelectView = root.app.create('Refine.RefineSelectView', {
         getTitleLabel: @settings.getTitleLabel
         viewTitleBarStyle: @settings.viewTitleBarStyle
         barColor: @settings.barColor
@@ -314,8 +318,8 @@ root.Refine.RefineView = class RefineView extends root.BaseView
             @propertyRows[field].refineProperty.value
         onClose: => @inSelectView = false
       })
-    @refineSeletView.update(e.row.refineProperty)
-    @inSelectView = true
-    @refineSeletView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
-    @refineSeletView.show()
+      refineSelectView.update(e.row.refineProperty)
+      @inSelectView = true
+      refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
+      refineSelectView.show()
     

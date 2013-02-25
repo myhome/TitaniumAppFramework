@@ -42,14 +42,27 @@ root.SearchTable_Framework = class SearchTable_Framework
       width: Ti.UI.FILL, height: Ti.UI.FILL
       backgroundColor: '#f8f8f8'
     }
-    view.add @createNoResultsViewLabel()
+    content = @createNoResultsContent()
+    content.add @createNoResultsViewImage()
+    content.add @createNoResultsViewLabel()
+    view.add content
     view.hide()
     view
+  createNoResultsContent: ->
+    Ti.UI.createView {
+      layout: 'vertical'
+      width: Ti.UI.SIZE, height: Ti.UI.SIZE
+    }
+  createNoResultsViewImage: ->
+    Ti.UI.createImageView {
+      width: 100, height: 100
+      image: root.framework.getDeviceDependentImage('/Common/Framework/Images/Controls/SearchTable/no-results.png')
+    }
   createNoResultsViewLabel: ->
     Ti.UI.createLabel {
       text: 'No Results\nFound'
       width: Ti.UI.SIZE
-      color: '#777'
+      color: '#bbb'
       textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER
     }
   
@@ -116,6 +129,7 @@ root.SearchTable_Framework = class SearchTable_Framework
             rows.push item
             @rowCount++
           @table.setData rows
+          @noResultsView.hide()
           @table.show()
         else
           @table.hide()

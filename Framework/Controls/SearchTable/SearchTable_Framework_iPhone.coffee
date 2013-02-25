@@ -8,6 +8,7 @@ root.SearchTable_Framework_iPhone = class SearchTable_Framework_iPhone extends r
   createNoResultsViewLabel: ->
     label = super
     label.applyProperties {
+      top: 20
       font: { fontSize: 18 }
     }
     label
