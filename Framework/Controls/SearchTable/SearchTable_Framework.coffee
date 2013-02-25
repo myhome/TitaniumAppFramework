@@ -17,6 +17,9 @@ root.SearchTable_Framework = class SearchTable_Framework
     @rowCount = 0
     @table = @createTable(@settings)
     
+    @noResultsView = @createNoResultsView()
+    @table.add @noResultsView
+    
   ## UI ##################################################################
   ########################################################################
   
@@ -33,6 +36,22 @@ root.SearchTable_Framework = class SearchTable_Framework
       table.setFooterView @createFooterView()
     
     table
+  
+  createNoResultsView: ->
+    view = Ti.UI.createView {
+      width: Ti.UI.FILL, height: Ti.UI.FILL
+      backgroundColor: '#f8f8f8'
+    }
+    view.add @createNoResultsViewLabel()
+    view.hide()
+    view
+  createNoResultsViewLabel: ->
+    Ti.UI.createLabel {
+      text: 'No Results\nFound'
+      width: Ti.UI.SIZE
+      color: '#777'
+      textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER
+    }
   
   createPullView: ->
     @headerView = Ti.UI.createView {
@@ -82,6 +101,7 @@ root.SearchTable_Framework = class SearchTable_Framework
   
   clear: =>
     @table.setData []
+    @rowCount = 0
   
   update: (data, hasMoreRows = false, toTop = false) =>
     if toTop
@@ -90,11 +110,16 @@ root.SearchTable_Framework = class SearchTable_Framework
         @rowCount++
     else
       if @rowCount is 0
-        rows = []
-        for item in data
-          rows.push item
-          @rowCount++
-        @table.setData rows
+        if data.length > 0
+          rows = []
+          for item in data
+            rows.push item
+            @rowCount++
+          @table.setData rows
+          @table.show()
+        else
+          @table.hide()
+          @noResultsView.show()
       else
         for item in data
           @table.appendRow item, { animated: false }

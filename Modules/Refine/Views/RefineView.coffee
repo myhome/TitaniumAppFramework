@@ -32,6 +32,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       closeOnCancel: true
       closeOnReset: true
       closeOnRefine: true
+      refineButtonsEnabled: true
     }, options
     
     @userCancelled = false
@@ -79,9 +80,12 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   createRefineButton: ->
     Ti.UI.createView()
       
-  createTable: => Ti.UI.createTableView {
-    headerView: @createHeaderView()
-  }
+  createTable: =>
+    tableView = Ti.UI.createTableView()
+    if @settings.refineButtonsEnabled
+      tableView.setHeaderView @createHeaderView()
+    
+    tableView
   
   createGroupSection: ->
     Ti.UI.createTableViewSection {}
@@ -252,6 +256,14 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         
       @changeHistory = {}
       @userCancelled = false
+  
+    if !@settings.refineButtonsEnabled
+      @settings.onRefine ( =>
+        updatedProperties= {}
+        for field, obj of @changeHistory
+          updatedProperties[field] = obj.value
+        updatedProperties
+      )() # Returns a object with property names and their new values
   
   onFocus: =>
     super

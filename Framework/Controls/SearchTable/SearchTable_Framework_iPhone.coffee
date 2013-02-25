@@ -5,6 +5,13 @@ root.SearchTable_Framework_iPhone = class SearchTable_Framework_iPhone extends r
   ## UI ##################################################################
   ########################################################################
   
+  createNoResultsViewLabel: ->
+    label = super
+    label.applyProperties {
+      font: { fontSize: 18 }
+    }
+    label
+  
   createPullView: ->
     view = super
     view.applyProperties {

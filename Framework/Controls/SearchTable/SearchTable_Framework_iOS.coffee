@@ -5,6 +5,22 @@ root.SearchTable_Framework_iOS = class SearchTable_Framework_iOS extends root.Se
   ## UI ##################################################################
   ########################################################################
   
+  createNoResultsView: ->
+    view = super
+    view.applyProperties {
+      left: 20, top: 20, right: 20, bottom: 20
+      borderWidth: 1
+      borderColor: '#bbb'
+      borderRadius: 10
+    }
+    view
+  createNoResultsViewLabel: ->
+    label = super
+    label.applyProperties {
+      shadowColor: '#fff', shadowOffset: { x: 0, y: 1 }
+    }
+    label
+  
   createTable: (options) ->
     table = super(options)
     table.applyProperties {
