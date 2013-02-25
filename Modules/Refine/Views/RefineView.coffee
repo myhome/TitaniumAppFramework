@@ -304,22 +304,22 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     if !@inSelectView
       Ti.API.info '------------- CLICK -------------'
       @inSelectView = true
-      refineSelectView = root.app.create('Refine.RefineSelectView', {
-        getTitleLabel: @settings.getTitleLabel
-        viewTitleBarStyle: @settings.viewTitleBarStyle
-        barColor: @settings.barColor
-        fontThemeColor: @settings.fontThemeColor
-        rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-        onChange: @onChange
-        onPropertyFetch: (field) =>
-          if @changeHistory[field]?
-            @changeHistory[field].value
-          else
-            @propertyRows[field].refineProperty.value
-        onClose: => @inSelectView = false
-      })
-      refineSelectView.update(e.row.refineProperty)
-      @inSelectView = true
-      refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
-      refineSelectView.show()
+      if !@refineSelectView?
+        @refineSelectView = root.app.create('Refine.RefineSelectView', {
+          getTitleLabel: @settings.getTitleLabel
+          viewTitleBarStyle: @settings.viewTitleBarStyle
+          barColor: @settings.barColor
+          fontThemeColor: @settings.fontThemeColor
+          rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+          onChange: @onChange
+          onPropertyFetch: (field) =>
+            if @changeHistory[field]?
+              @changeHistory[field].value
+            else
+              @propertyRows[field].refineProperty.value
+          onClose: => @inSelectView = false
+        })
+      @refineSelectView.update(e.row.refineProperty)
+      @refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
+      @refineSelectView.show()
     
