@@ -10,7 +10,7 @@ root.Button_Framework = class Button_Framework
       height: 30
       left: null
       right: null
-      text: "Button"
+      text: ''
       top: null
       width: Ti.UI.SIZE
       onClick: () => Ti.API.info("button clicked")
