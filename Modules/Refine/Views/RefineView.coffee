@@ -283,17 +283,19 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       row.refineProperty.dynamicDataDependency? and row.refineProperty.dynamicDataDependency is change.field
     )
     
+    # Update all dependent properties
     for row in dynamicFields
-      row.refineProperty = root._.extend row.refineProperty, {
-        value: @resetProperties[row.refineProperty.field].value
-      }
-      
-      if row.refineProperty.type? and row.refineProperty.type is 2
-        row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
-      else
-        row.displayControl.setText @getDisplay(row.refineProperty)
-      delete @changeHistory[row.refineProperty.field]
+      if row.refineProperty.value != change.value
+        row.refineProperty = root._.extend row.refineProperty, {
+          value: row.refineProperty.default
+        }
+        if row.refineProperty.type? and row.refineProperty.type is 2
+          row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
+        else
+          row.displayControl.setText @getDisplay(row.refineProperty)
+        delete @changeHistory[row.refineProperty.field]
     
+    # Update Changed Property Label/Checkbox
     propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: change.value }
     if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
       propertyRow.checkboxControl.setValue if propertyRow.refineProperty.value then propertyRow.refineProperty.value else false
@@ -304,22 +306,21 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     if !@inSelectView
       Ti.API.info '------------- CLICK -------------'
       @inSelectView = true
-      if !@refineSelectView?
-        @refineSelectView = root.app.create('Refine.RefineSelectView', {
-          getTitleLabel: @settings.getTitleLabel
-          viewTitleBarStyle: @settings.viewTitleBarStyle
-          barColor: @settings.barColor
-          fontThemeColor: @settings.fontThemeColor
-          rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-          onChange: @onChange
-          onPropertyFetch: (field) =>
-            if @changeHistory[field]?
-              @changeHistory[field].value
-            else
-              @propertyRows[field].refineProperty.value
-          onClose: => @inSelectView = false
-        })
-      @refineSelectView.update(e.row.refineProperty)
-      @refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
-      @refineSelectView.show()
+      refineSelectView = root.app.create('Refine.RefineSelectView', {
+        getTitleLabel: @settings.getTitleLabel
+        viewTitleBarStyle: @settings.viewTitleBarStyle
+        barColor: @settings.barColor
+        fontThemeColor: @settings.fontThemeColor
+        rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+        onChange: @onChange
+        onPropertyFetch: (field) =>
+          if @changeHistory[field]?
+            @changeHistory[field].value
+          else
+            @propertyRows[field].refineProperty.value
+        onClose: => @inSelectView = false
+      })
+      refineSelectView.update(e.row.refineProperty)
+      refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
+      refineSelectView.show()
     
