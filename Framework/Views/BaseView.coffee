@@ -71,7 +71,10 @@ root.BaseView = class BaseView
         @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/#{@settings.viewTitleBarStyle}.png"
     if @settings.style?
       if @settings.style == 'brushedMetal'
-       @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
+        if Ti.Platform.osname == 'ipad'
+          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal-ipad.jpg'
+        else
+          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
        #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
 
   focus: (e) =>
