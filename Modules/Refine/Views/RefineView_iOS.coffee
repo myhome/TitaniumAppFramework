@@ -85,6 +85,10 @@ root.Refine.RefineView_iOS = class RefineView_iOS extends root.Refine.RefineView
   updatePropertyRowStatus: (propertyRow, dependencyMissing) =>
     super(propertyRow, dependencyMissing)
     if dependencyMissing
-      propertyRow.setSelectionStyle Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+      propertyRow.applyProperties {
+        selectionStyle: Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+      }
     else
-      propertyRow.setSelectionStyle Ti.UI.iPhone.TableViewCellSelectionStyle.BLUE
+      propertyRow.applyProperties {
+        selectionStyle: Ti.UI.iPhone.TableViewCellSelectionStyle.BLUE
+      }
