@@ -271,7 +271,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     @inSelectView = false
     @refreshDependencies()
   
-  onChange: (change) => # { field: 'name', value: [value] }
+  onChange: (change) => # { field: 'name', value: [value], data: [] }
     propertyRow = @propertyRows[change.field]
     @changeHistory[change.field] = {
       originalLabel: if propertyRow.displayControl? then propertyRow.displayControl.getText() else ''
@@ -296,7 +296,10 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         delete @changeHistory[row.refineProperty.field]
     
     # Update Changed Property Label/Checkbox
-    propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: change.value }
+    propertyRow.refineProperty = root._.extend propertyRow.refineProperty, {
+      value: change.value
+      data: change.data
+    }
     if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
       propertyRow.checkboxControl.setValue if propertyRow.refineProperty.value then propertyRow.refineProperty.value else false
     else

@@ -60,11 +60,11 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
         values
       )()
       if selectedValues.length is 0
-        @selectedRows[0].label
+        @selectedRows[0].title
       else
         return "Selected #{selectedValues.length}"
     else
-      @selectedRows[0].label
+      @selectedRows[0].title
   
   ############################################################
   ### METHODS ################################################
@@ -79,7 +79,9 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     if @property.dynamicData?
       @property.dynamicData {
         dependencyValue: @settings.onPropertyFetch(@property.dynamicDataDependency)
-        callback: (data) => @populateTable(data)
+        callback: (data) =>
+          @property.data = data
+          @populateTable(data)
       }
     else
       @populateTable(@property.data)
@@ -219,5 +221,5 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       @selectRow @defaultRow, true
     
     @property.value = @getValue()
-    @settings.onChange { field: @property.field, value: @getValue() }
+    @settings.onChange { field: @property.field, value: @getValue(), data: @property.data }
     @close() if @property.mode is root.Refine.RefineSelectView.Mode.SINGLE
