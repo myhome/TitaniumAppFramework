@@ -43,15 +43,15 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
   
   showLoadingIndicator: =>
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
-      @loadingView.show()
+      @loadingView.show() if @loadingView?
     else
-      @activityIndicator.show()
+      @activityIndicator.show() if @activityIndicator?
     
   hideLoadingIndicator: =>
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
-      @loadingView.hide()
+      @loadingView.hide() if @loadingView?
     else
-      @activityIndicator.hide()
+      @activityIndicator.hide() if @activityIndicator?
   
   dispose: =>
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
