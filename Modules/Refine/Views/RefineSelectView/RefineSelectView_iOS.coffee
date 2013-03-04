@@ -33,7 +33,7 @@ root.Refine.RefineSelectView_iOS = class RefineSelectView_iOS extends root.Refin
   ############################################################
   ### METHODS ################################################
   ############################################################
-    
+  
   updateTitle: (title) =>
     if @titleLabel?
       @titleLabel.setText if title? then title else 'Select'

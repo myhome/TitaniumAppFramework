@@ -16,6 +16,9 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     @defaultRow = null
     @table = @createTable()
     @add @table
+        
+    @headers = []
+    @index = []
 
     @createCancelButton()
     @createDoneButton()
@@ -99,7 +102,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       
       if shouldAddRow
       
-        row = @createTableRow(item.label)
+        row = @createTableRow(item.label, index)
         
         if @hasCheck(@property, item.value)
           row.setHasCheck true
@@ -113,13 +116,21 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
         
         rows.push row
     
+    @table.index = @index
+    
     @table.setData rows
   
-  createTableRow: (label) ->
+  createTableRow: (label, index) =>
     options = {
       title: label
       backgroundColor: '#fff'
     }
+    
+    letter = label.replace('-- ', '').substr(0, 1)
+    if @headers.indexOf(letter) == -1
+      @headers.push letter
+      root._.extend options, { header: letter }
+      @index.push { title: letter, index: index }
     
     if @settings.rowSelectedBackgroundColor?
       root._.extend options , {

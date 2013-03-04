@@ -36,7 +36,7 @@ root.Refine.RefineSelectView_Android = class RefineSelectView_Android extends ro
     table.setSeparatorColor '#ddd'
     table
   
-  createTableRow: (label) =>
+  createTableRow: (label, index) =>
     Ti.UI.createTableViewRow {
       height: '50dp'
       title: label
