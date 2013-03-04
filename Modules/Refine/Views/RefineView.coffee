@@ -316,6 +316,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         fontThemeColor: @settings.fontThemeColor
         rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
         onChange: @onChange
+        enableSelectIndex: e.row.refineProperty.enableSelectIndex
         onPropertyFetch: (field) =>
           if @changeHistory[field]?
             @changeHistory[field].value

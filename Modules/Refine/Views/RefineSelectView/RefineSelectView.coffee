@@ -10,6 +10,7 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       style: 'brushedMetal'
       onChange: -> 'root.Refine.RefineSelectView: onChange'
       onConditionCheck: -> 'root.Refine.RefineSelectView: onConditionCheck'
+      enableSelectIndex: false
     }, options
     
     @selectedRows = []
@@ -116,7 +117,8 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
         
         rows.push row
     
-    @table.index = @index
+    if @settings.enableSelectIndex
+      @table.index = @index
     
     @table.setData rows
   
@@ -126,11 +128,12 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       backgroundColor: '#fff'
     }
     
-    letter = label.replace('-- ', '').substr(0, 1)
-    if @headers.indexOf(letter) == -1
-      @headers.push letter
-      root._.extend options, { header: letter }
-      @index.push { title: letter, index: index }
+    if @settings.enableSelectIndex
+      letter = label.replace('-- ', '').substr(0, 1)
+      if @headers.indexOf(letter) == -1
+        @headers.push letter
+        root._.extend options, { header: letter }
+        @index.push { title: letter, index: index }
     
     if @settings.rowSelectedBackgroundColor?
       root._.extend options , {
