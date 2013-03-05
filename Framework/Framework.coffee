@@ -4,6 +4,9 @@
 root._ = require('Common/Framework/Lib/underscore')._
 _ = root._
 
+root.moment = require('Common/Framework/Lib/moment.min')
+root.ent = require('Common/Framework/Lib/ent')
+
 Array::first = -> _.first @ #TODO: GJ: move to extensions.js
 Array::without = (value) -> _.without @, value
 Array::shuffle = -> _.shuffle(@) 
