@@ -123,12 +123,16 @@ root.ImageButton_Framework = class ImageButton_Framework
   onTouchEnd: =>
     @options.onClick()
     @button.backgroundImage = @bg if !@button.isPressed
+  
+  onTouchCancel: =>
+    @button.backgroundImage = @bg if !@button.isPressed
      
   setEnabled: (enabled) =>
     if @enabled != enabled
       if enabled
         @button.addEventListener "touchstart", @onTouchStart
         @button.addEventListener "touchend", @onTouchEnd
+        @button.addEventListener "touchcancel", @onTouchCancel
         if @label?
           @label.setOpacity(1)
         if @icon
@@ -137,6 +141,7 @@ root.ImageButton_Framework = class ImageButton_Framework
       else
         @button.removeEventListener "touchstart", @onTouchStart
         @button.removeEventListener "touchend", @onTouchEnd
+        @button.addEventListener "touchcancel", @onTouchCancel
         if @label?
           @label.setOpacity(0.4)
         if @icon

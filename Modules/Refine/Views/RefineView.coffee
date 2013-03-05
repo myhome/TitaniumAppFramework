@@ -26,20 +26,23 @@ root.Refine.RefineView = class RefineView extends root.BaseView
           ]
         }
       ]
-      onReset: ->
-      onRefine: ->
+      onReset: -> Ti.API.info 'root.Refine.RefineView.onReset'
+      onRefine: -> Ti.API.info 'root.Refine.RefineView.onRefine'
+      onCancel: -> Ti.API.info 'root.Refine.RefineView.onCancel'
+      closeOnCancel: true
+      closeOnReset: true
+      closeOnRefine: true
+      refineButtonsEnabled: true
     }, options
     
-    @cancelled = false
-    # @refineViews = []
-    @propertyRows = []
-    @changedProperties = {}
-    @changeHistory = []
+    @userCancelled = false
+    @propertyRows = {}
+    @changeHistory = {}
+    @resetProperties = {}
+    @inSelectView = false
     
     @add @build()
-    
     @createCancelButton()
-    @createResetButton()
   
   ############################################################
   ### UI #####################################################
@@ -52,59 +55,80 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     for group in @settings.groups
       section = @createGroupSection()
       for property in group.properties
+        
         propertyRow = @createPropertyRow(property)
-        @propertyRows.push propertyRow
+        @propertyRows[property.field] = propertyRow
+        @resetProperties[property.field] = {
+          row: propertyRow
+          label: @getPropertyDisplayLabel(property, property.value)
+          value: property.value
+        }
         section.add propertyRow
+        
       groupsSections.push section
-    
     table.setData groupsSections
-    
-    if @settings.getRefineButton?
-      container = Ti.UI.createView { height: Ti.UI.SIZE }
-      button = @settings.getRefineButton()
-      button.addEventListener('click', @refine)
-      container.add button
-      table.setFooterView container
     
     table
   
   createCancelButton: ->
+    
+  createHeaderView: =>
+    Ti.UI.createView()
   
   createResetButton: ->
-  
-  createTable: ->
-    Ti.UI.createTableView()
+    Ti.UI.createView()
+    
+  createRefineButton: ->
+    Ti.UI.createView()
+      
+  createTable: =>
+    tableView = Ti.UI.createTableView()
+    if @settings.refineButtonsEnabled
+      tableView.setHeaderView @createHeaderView()
+    
+    tableView
   
   createGroupSection: ->
-    Ti.UI.createTableViewSection {
-      headerView: Ti.UI.createView { height: 1 }
-    }
+    Ti.UI.createTableViewSection {}
   
   createPropertyRow: (property) =>
-    row = Ti.UI.createTableViewRow {
+    options = {
       backgroundColor: '#fff'
-      hasChild: true
+      hasChild: ((property.type? and property.type is 1) or !property.type?)
     }
-    row.addEventListener('click', @onRowClicked)
     
     if @settings.rowSelectedBackgroundColor?
-      row.setSelectedBackgroundColor @settings.rowSelectedBackgroundColor
+      root._.extend options , {
+        selectedBackgroundColor: @settings.rowSelectedBackgroundColor
+      }
+
+    row = Ti.UI.createTableViewRow options
     
     title = @createPropertyTitle(property.title)
-    value = @createPropertyDisplay(@getPropertyDisplayLabel(property, property.value))
-    
     row.add title
-    row.add value
-    
     row.titleControl = title
-    row.displayControl = value
-    row.property = property
+    
+    if property.type? and property.type is 2
+      checkbox = @createPropertyCheckbox(property.value)
+      row.add checkbox
+      row.checkboxControl = checkbox
+    else
+      value = @createPropertyDisplay(@getDisplay(property))
+      row.add value
+      row.displayControl = value
+    
+    
+    row.refineProperty = property
+    
+    @checkDependency(row)
+    
     row
   
   createPropertyTitle: (title) ->
     Ti.UI.createLabel {
       left: 0
       text: title
+      textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT
     }
   
   createPropertyDisplay: (display) =>
@@ -112,6 +136,13 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       right: 0
       text: display
       color: @settings.rowValueColor
+      textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT
+    }
+  
+  createPropertyCheckbox: (value) =>
+    Ti.UI.createSwitch {
+      right: 10
+      value: if value then value else false
     }
   
   createTableRow: ->
@@ -123,24 +154,89 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   ### METHODS ################################################
   ############################################################
   
+  refreshDependencies: =>
+    for field, row of @propertyRows
+      if row.refineProperty.dependency?
+        @checkDependency(row)
+  
+  checkDependency: (propertyRow) =>
+    if propertyRow.refineProperty.dependency?
+      dependencyPropertyRow = @propertyRows[propertyRow.refineProperty.dependency]
+      if dependencyPropertyRow? and dependencyPropertyRow.refineProperty.value?
+        @updatePropertyRowStatus(propertyRow, false)
+      else
+        @updatePropertyRowStatus(propertyRow, true)
+    else
+      @updatePropertyRowStatus(propertyRow, false)
+  
+  updatePropertyRowStatus: (propertyRow, dependencyMissing) =>
+    if dependencyMissing
+      if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
+        propertyRow.checkboxControl.setEnabled false
+        propertyRow.checkboxControl.removeEventListener('change', (e) => @onChange { field: propertyRow.refineProperty.field, value: e.value }) if propertyRow.active
+        propertyRow.active = false
+      else
+        propertyRow.titleControl.color = '#CCC'
+        propertyRow.removeEventListener('click', @onRowClicked) if propertyRow.active
+        propertyRow.active = false
+    else
+      if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
+        propertyRow.checkboxControl.setEnabled true
+        propertyRow.checkboxControl.addEventListener('change', (e) => @onChange { field: propertyRow.refineProperty.field, value: e.value }) if !propertyRow.active
+        propertyRow.active = true
+      else
+        propertyRow.titleControl.color = '#000'
+        propertyRow.addEventListener('click', @onRowClicked) if !propertyRow.active
+        propertyRow.active = true
+  
   getPropertyDisplayLabel: (property, value) ->
-    data = root._.find(property.data, (item) -> return item.value is value)
+    data = root._.find(property.data, (item) ->
+      return item.value is value
+    )
     if data?
       data.label
     else
       ' '
   
+  getDisplay: (property) =>
+    if property.mode is root.Refine.RefineSelectView.Mode.MULTI
+      if property.value?
+        "Selected #{property.value.length}"
+      else
+        @getPropertyDisplayLabel(property, property.value)
+    else
+      item =  root._.find(property.data, (item) -> item.value is property.value)
+      item.label
+  
   cancelRefine: =>
-    @cancelled = true
-    @close()
+    @userCancelled = true
+    @close() if @settings.closeOnCancel
+    @settings.onCancel()
   
   reset: =>
-    @settings.onReset()
-    @close()
+    resetProperties = @settings.onReset()
+    for field, value of resetProperties
+      row = @propertyRows[field]
+      if row?
+        row.refineProperty = root._.extend row.refineProperty, { value: value }
+        
+        if row.refineProperty.type? and row.refineProperty.type is 2
+          row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
+        else
+          row.displayControl.setText @getDisplay(row.refineProperty)
+    
+    @changeHistory = {}
+    @refreshDependencies()
+    @close() if @settings.closeOnReset
   
   refine: =>
-    @settings.onRefine(@changedProperties)
-    @close()
+    @settings.onRefine ( =>
+      updatedProperties= {}
+      for field, obj of @changeHistory
+        updatedProperties[field] = obj.value
+      updatedProperties
+    )() # Returns a object with property names and their new values
+    @close() if @settings.closeOnRefine
     
   ############################################################
   ### EVENTS #################################################
@@ -148,46 +244,87 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   
   onClose: =>
     super
-    if @cancelled
-      for history in @changeHistory
-        history.row.displayControl.setText history.label
-      @changedProperties = []
-      @cancelled = false
+    if @userCancelled
+      for field, obj of @changeHistory
+        propertyRow = @propertyRows[field]
+          
+        if propertyRow?
+          if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
+            propertyRow.checkboxControl.setValue if propertyRow.refineProperty.originalValue then propertyRow.refineProperty.originalValue else false
+          else
+            propertyRow.displayControl.setText obj.originalLabel
+          propertyRow.refineProperty = root._.extend propertyRow.refineProperty, { value: obj.originalValue }
+        
+      @changeHistory = {}
+      @userCancelled = false
   
-  onChange: (e) =>
-    propertyRow = root._.find(@propertyRows, (propertyRow) -> return propertyRow.property.field is e.field)
-    if propertyRow?
-      @changeHistory.push { row: propertyRow, label: propertyRow.displayControl.getText() }
-      propertyRow.displayControl.setText e.label
-      @changedProperties[e.field] = e.value
+    if !@settings.refineButtonsEnabled
+      @settings.onRefine ( =>
+        updatedProperties= {}
+        for field, obj of @changeHistory
+          updatedProperties[field] = obj.value
+        updatedProperties
+      )() # Returns a object with property names and their new values
+  
+  onFocus: =>
+    super
+    @inSelectView = false
+    @refreshDependencies()
+  
+  onChange: (change) => # { field: 'name', value: [value], data: [] }
+    propertyRow = @propertyRows[change.field]
+    @changeHistory[change.field] = {
+      originalLabel: if propertyRow.displayControl? then propertyRow.displayControl.getText() else ''
+      originalValue: propertyRow.refineProperty.value
+      value: change.value
+    }
     
-  onRowClicked: (e) =>
-    root.app.create('Refine.RefineSelectView', {
-      getTitleLabel: @settings.getTitleLabel
-      barImage: @settings.barImage
-      rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-      property: e.row.property
-      onChange: @onChange
-      onPropertyFetch: (field) => @changedProperties[field]
-    }).show()
-    # refineViews = root._.filter(@refineViews, (view) ->
-      # return view.settings.property.title is e.row.property.title
-    # )
-#     
-    # if refineViews.length > 0
-      # refineViews[0].update()
-      # refineViews[0].show()
-    # else
-      # view = root.app.create('Refine.RefineSelectView', {
-        # getTitleLabel: @settings.getTitleLabel
-        # barImage: @settings.barImage
-        # rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
-        # property: e.row.property
-        # onChange: @onChange
-        # onPropertyFetch: (field) => @changedProperties[field]
-      # })
-      # if view?
-        # @refineViews.push view
-        # view.show()
+    dynamicFields = root._.filter(@propertyRows, (row) ->
+      row.refineProperty.dynamicDataDependency? and row.refineProperty.dynamicDataDependency is change.field
+    )
+    
+    # Update all dependent properties
+    for row in dynamicFields
+      if row.refineProperty.value != change.value
+        row.refineProperty = root._.extend row.refineProperty, {
+          value: row.refineProperty.default
+        }
+        if row.refineProperty.type? and row.refineProperty.type is 2
+          row.checkboxControl.setValue if row.refineProperty.value then row.refineProperty.value else false
+        else
+          row.displayControl.setText @getDisplay(row.refineProperty)
+        delete @changeHistory[row.refineProperty.field]
+    
+    # Update Changed Property Label/Checkbox
+    propertyRow.refineProperty = root._.extend propertyRow.refineProperty, {
+      value: change.value
+      data: change.data
+    }
+    if propertyRow.refineProperty.type? and propertyRow.refineProperty.type is 2
+      propertyRow.checkboxControl.setValue if propertyRow.refineProperty.value then propertyRow.refineProperty.value else false
+    else
+      propertyRow.displayControl.setText @getDisplay(propertyRow.refineProperty)
   
+  onRowClicked: (e) =>
+    if !@inSelectView
+      Ti.API.info '------------- CLICK -------------'
+      @inSelectView = true
+      refineSelectView = root.app.create('Refine.RefineSelectView', {
+        getTitleLabel: @settings.getTitleLabel
+        viewTitleBarStyle: @settings.viewTitleBarStyle
+        barColor: @settings.barColor
+        fontThemeColor: @settings.fontThemeColor
+        rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
+        onChange: @onChange
+        enableSelectIndex: e.row.refineProperty.enableSelectIndex
+        onPropertyFetch: (field) =>
+          if @changeHistory[field]?
+            @changeHistory[field].value
+          else
+            @propertyRows[field].refineProperty.value
+        onClose: => @inSelectView = false
+      })
+      refineSelectView.update(e.row.refineProperty)
+      refineSelectView.settings.navigationGroup = @settings.navigationGroup if @settings.navigationGroup
+      refineSelectView.show()
     

@@ -1,33 +1,33 @@
 root.TwoLineTitle_Framework_iOS = class TwoLineTitle_Framework_iOS extends root.TwoLineTitle_Framework
   constructor: (options = {}) ->
-    options = root._.extend {}, options
-    super options
-
+    super root._.extend {}, options
+  
+  ## UI ##################################################################
+  ########################################################################
+  
   createTitle: =>
-    title = super
-    title.updateLayout { 
-      shadowColor: '#222'
-      shadowOffset: { x: 0, y: -1 }
+    label = super
+    label.applyProperties { 
+      shadowColor: '#222', shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
+      minimumFontSize: 13
     }
-    title.setMinimumFontSize 13
-    
-    title
+    label
     
   createSubTitle: =>
-    subTitle = super
-    subTitle.updateLayout { 
-      shadowColor: '#222'
-      shadowOffset: { x: 0, y: -1 }
+    label = super
+    label.applyProperties { 
+      shadowColor: '#222', shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
     }
     
-    subTitle
+    label
   
   createBigTitle: =>
-    bigTitle = super
-    bigTitle.updateLayout { 
-      shadowColor: '#222'
-      shadowOffset: { x: 0, y: -1 }
+    label = super
+    label.applyProperties { 
+      shadowColor: '#222', shadowOffset: { x: 0, y: -1 }
+      width: Ti.UI.FILL
+      minimumFontSize: 15
     }
-    bigTitle.setMinimumFontSize 15
-    
-    bigTitle
+    label

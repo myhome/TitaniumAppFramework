@@ -10,6 +10,7 @@ root.BaseView = class BaseView
       viewTitleBarStyle: root.app.settings.viewTitleBarStyle
       useImageButtons: root.app.settings.useImageButtons
       orientationModes: root.app.settings.defaultOrientationModes
+      disposeOnClose: false
     }, options)
     @applyStyle()
     
@@ -29,7 +30,7 @@ root.BaseView = class BaseView
   buildLayout: =>
     if Ti.Platform.osname == "android" && !@settings.isHome
       @header = root.app.create('HeaderControl', {
-        backgroundGradient: root.app.settings.viewTitleBarGradient
+        backgroundColor: @settings.barColor
         height: '50dp'
       })
       @window.add(@header.view)
@@ -70,11 +71,14 @@ root.BaseView = class BaseView
         @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/#{@settings.viewTitleBarStyle}.png"
     if @settings.style?
       if @settings.style == 'brushedMetal'
-       @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
+        if Ti.Platform.osname == 'ipad'
+          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal-ipad.jpg'
+        else
+          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
        #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
 
   focus: (e) =>
-    Ti.API.info 'BaseView.focus'
+    #Ti.API.info 'BaseView.focus'
     @onInit() if !@uiInitialised
     @onFocus()
     @uiInitialised = true
@@ -98,10 +102,12 @@ root.BaseView = class BaseView
       @onLandscape()
       
   onFocus: ->
-    Ti.API.info 'BaseView.onFocus'
+    #Ti.API.info 'BaseView.onFocus'
     
   show: (options = {}) =>
-    if @settings.navGroup?
+    if @settings.navigationGroup?
+      @settings.navigationGroup.open(@window, options)
+    else if @settings.navGroup?
       @settings.navGroup.navGroup.open(@window, options)
     else if root.tabGroup?
       @window.inTabGroup = true
@@ -117,8 +123,10 @@ root.BaseView = class BaseView
     options = root._.extend({}, options)
     @window.open(options)
 
-  close: (options = {}) =>
-    if @window.navGroup?
+  close: (options = { animated : true }) =>
+    if @settings.navigationGroup?
+      @settings.navigationGroup.close(@window, options)
+    else if @window.navGroup?
       @window.navGroup.navGroup.close(@window, options)
     else if @window.inTabGroup
       root.tabGroup.tabs.activeTab.close(@window, options)
@@ -126,13 +134,18 @@ root.BaseView = class BaseView
       root.navGroup.navGroup.close(@window, options)
     else
       @window.close(options)
-    @onClose()
     @isOpen = false
       
-  onClose: ->
+  onClose: =>
+    @dispose() if @settings.disposeOnClose
     
   onBlur: ->
   
+  dispose: =>    
+    @clear()
+    @content = null
+    @window = null
+      
   add: (control) ->
     @content.add control
     @controls.push control

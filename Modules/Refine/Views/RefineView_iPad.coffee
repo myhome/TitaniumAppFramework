@@ -1,4 +1,4 @@
-root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.RefineView_iOS
+root.Refine.RefineView_iPad = class RefineView_iPad extends root.Refine.RefineView_iOS
   constructor: (options = {}) ->
     super root._.extend {}, options
       
@@ -6,22 +6,11 @@ root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.Refi
   ### UI #####################################################
   ############################################################
   
-  createGroupSection: ->
-    Ti.UI.createTableViewSection {
-      headerView: Ti.UI.createView { height: 1 }
-    }
-  
-  createPropertyRow: (property) =>
-    row = super(property)
-    if property.type is 2
-      row.setSelectionStyle Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
-    row
-  
   createPropertyTitle: (title) ->
     label = super(title)
     label.updateLayout {
       left: 10
-      font: { fontSize: 15, fontWeight: 'bold' }
+      font: { fontSize: 16, fontWeight: 'bold' }
     }
     label
   
@@ -29,7 +18,7 @@ root.Refine.RefineView_iPhone = class RefineView_iPhone extends root.Refine.Refi
     label = super(display)
     label.updateLayout {
       right: 10
-      font: { fontSize: 15 }
-      width: 150
+      font: { fontSize: 16 }
+      width: 300
     }
     label

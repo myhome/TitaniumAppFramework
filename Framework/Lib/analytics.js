@@ -238,7 +238,15 @@ var Analytics = AnalyticsBase.extend({
 			
 			var eventsToDelete = [];
 			
-			while(eventRows.isValidRow()) {				
+			while(eventRows.isValidRow()) {
+				
+				inlineHttpClientRequest = function(path, userAgent){
+					var httpClient = Ti.Network.createHTTPClient();
+					httpClient.open('GET', 'http://www.google-analytics.com' + path, true);
+					httpClient.setRequestHeader('User-Agent', userAgent);
+					httpClient.send();
+				}
+				
 				var event = {
 					event_id:eventRows.fieldByName('event_id'),
 					user_id:eventRows.fieldByName('user_id'),
@@ -256,13 +264,13 @@ var Analytics = AnalyticsBase.extend({
 				
 				var path = this._constructRequestPath(event);
 				Titanium.API.log(path);
-				
-				this._httpClient.open('GET', 'http://www.google-analytics.com' + path, false);
-				this._httpClient.setRequestHeader('User-Agent', this._USER_AGENT);
-				this._httpClient.send();
+        
+				inlineHttpClientRequest(path, this._USER_AGENT)
+				// this._httpClient.open('GET', 'http://www.google-analytics.com' + path, false);
+				// this._httpClient.setRequestHeader('User-Agent', this._USER_AGENT);
+				// this._httpClient.send();
 				
 				eventsToDelete.push(event.event_id);
-				
 				eventRows.next();
 			}
 			
