@@ -19,6 +19,9 @@ root.MobileAppBase = class MobileAppBase
       @analytics = new Analytics(@settings.googleAnalyticsID, @settings.appName, @settings.appVersion)
       @analytics.start(10)
     
+    if Ti.Filesystem.getFile('dev.env').exists()
+      @settings.accountDomain = @settings.devAccountDomain
+    
     @sounds = new root.SoundCache()
     @classFactory = new root.ClassFactory({ ignoreAndroidTablet: @settings.ignoreAndroidTablet })
     @network = new root.Network()
