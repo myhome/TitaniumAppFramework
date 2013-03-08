@@ -1,9 +1,3 @@
-# root.framework.include('/Common/Framework/Network.js')
-# root.framework.include('/Common/Framework/SoundCache.js')
-# root.framework.include('/Common/Framework/TimeoutGroup.js')
-
-root.moduleNames = []
-
 root.MobileAppBase = class MobileAppBase
   constructor: (options) ->
     @settings = root._.extend({
@@ -35,20 +29,17 @@ root.MobileAppBase = class MobileAppBase
     
     Ti.Network.addEventListener('change', (e) => @checkInternet(e.online) if !@checking)
   
-  
-    
-  delay: (ms, func) -> 
-    if ms == 0
-      func()
-    else
-      setTimeout(func, ms)
+  delay: (ms, func) ->
+    if ms == 0 then func() else setTimeout(func, ms)
       
-  randomDelay: (randomDelay, minDelay, func) -> @delay (Math.random() * randomDelay) + minDelay, func
-  timeout: (ms, func) -> setInterval func, ms #TODO: GJ: rename to interval
+  randomDelay: (randomDelay, minDelay, func) ->
+    @delay (Math.random() * randomDelay) + minDelay, func
+    
+  debug: (msg) ->
+    Ti.API.info(msg)
 
-  debug: (msg) -> Ti.API.info(msg)
-
-  create: (className, options = {}) -> @classFactory.create(className, options)
+  create: (className, options = {}) ->
+    @classFactory.create(className, options)
 
   post: (url, params, onSuccess, onError = null) => #TODO: GJ: depreciate
     @network.ajax({
