@@ -15,8 +15,6 @@ root.MobileAppBase = class MobileAppBase
       useImageButtons: false
     }, options)
     
-    @debugMode = @settings.debugMode
-    
     if @settings.googleAnalyticsID
       @analytics = new Analytics(@settings.googleAnalyticsID, @settings.appName, @settings.appVersion)
       @analytics.start(10)
@@ -37,7 +35,10 @@ root.MobileAppBase = class MobileAppBase
     
   debug: (msg) ->
     Ti.API.info(msg)
-
+  
+  isDebugMode: ->
+    @settings.debugMode
+  
   create: (className, options = {}) ->
     @classFactory.create(className, options)
 
