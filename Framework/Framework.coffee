@@ -121,13 +121,3 @@ root.Framework = class Framework
     else
       parts = url.split('/Images')
       "#{parts[0]}/Images/iOS#{parts[1]}"
-  
-  post: (url, params, onSuccess, onError = null) =>
-    @xhr.abort()
-    @xhr.open('POST', url)
-    @xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    @xhr.onload = () ->
-      onSuccess(JSON.parse(@responseText))
-    @xhr.onerror = () ->
-      onError() if onError
-    @xhr.send(params)
