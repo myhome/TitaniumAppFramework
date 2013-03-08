@@ -1,19 +1,13 @@
-# Ti.include('ClassFactory.js')
-# Ti.include('Common/Framework/Lib/analytics.js')
-
 root._ = require('Common/Framework/Lib/underscore')._
-_ = root._
-
 root.moment = require('Common/Framework/Lib/moment.min')
 root.ent = require('Common/Framework/Lib/ent')
+root.moduleNames = []
 
-Array::first = -> _.first @ #TODO: GJ: move to extensions.js
-Array::without = (value) -> _.without @, value
-Array::shuffle = -> _.shuffle(@) 
+Array::first = -> root._.first @ #TODO: GJ: move to extensions.js
+Array::without = (value) -> root._.without @, value
+Array::shuffle = -> root._.shuffle(@) 
 Array::random = -> @.shuffle().first()
 Array::random_without = (value) -> @without(value).random()
-
-root.moduleNames = []
 
 root.Framework = class Framework
   constructor: (options) ->
