@@ -22,8 +22,6 @@ root.MobileAppBase = class MobileAppBase
     @sounds = new root.SoundCache()
     @classFactory = new root.ClassFactory({ ignoreAndroidTablet: @settings.ignoreAndroidTablet })
     @network = new root.Network()
-    @includedFiles = []
-    @zIndex = 100
     
     Ti.Network.addEventListener('change', (e) => @checkInternet(e.online) if !@checking)
   
