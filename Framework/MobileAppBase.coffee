@@ -41,14 +41,6 @@ root.MobileAppBase = class MobileAppBase
   create: (className, options = {}) ->
     @classFactory.create(className, options)
 
-  post: (url, params, onSuccess, onError = null) => #TODO: GJ: depreciate
-    @network.ajax({
-      url: url
-      params: params
-      onSuccess: onSuccess
-      onError: onError
-    })
-
   noInternetEnable: =>
     @settings.noInternetViewEnabled = true
     @checkInternet() if !@checking
