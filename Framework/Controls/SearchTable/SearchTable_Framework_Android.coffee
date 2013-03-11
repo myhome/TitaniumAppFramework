@@ -8,17 +8,29 @@ root.SearchTable_Framework_Android = class SearchTable_Framework_Android extends
   ########################################################################
   
   createNoResultsView: ->
-    view = super
-    view.applyProperties {
-      left: '20dp', top: '20dp', right: '20dp', bottom: '20dp'
+    view = Ti.UI.createView {
+      width: '300dp', height: '300dp'
+      backgroundColor: '#f8f8f8'
     }
+    content = @createNoResultsContent()
+    content.add @createNoResultsViewImage()
+    content.add @createNoResultsViewLabel()
+    view.add content
+    view.hide()
     view
+    
   createNoResultsViewImage: ->
     imageView = super
     imageView.applyProperties {
       width: '100dp', height: '100dp'
     }
     imageView
+  createNoResultsViewLabel: ->
+    label = super
+    label.applyProperties {
+      top: '20dp', font: { fontSize: '18dp' }
+    }
+    label
     
   createTable: (options) =>
     table = Ti.UI.createTableView options

@@ -128,6 +128,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     Ti.UI.createLabel {
       left: 0
       text: title
+      color: '#000'
       textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT
     }
   
