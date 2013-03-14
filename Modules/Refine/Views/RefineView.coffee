@@ -237,7 +237,15 @@ root.Refine.RefineView = class RefineView extends root.BaseView
         @getPropertyDisplayLabel(property, property.value)
     else
       item =  root._.find(property.data, (item) -> item.value is property.value)
-      item.label
+      if !item?
+        property.value = property.default
+        item = root._.find(property.data, (item) -> item.value is property.default)
+        if !item?
+          ''
+        else
+          item.label
+      else  
+        item.label
   
   cancelRefine: =>
     @userCancelled = true
