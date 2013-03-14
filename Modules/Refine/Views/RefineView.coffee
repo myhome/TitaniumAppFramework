@@ -41,7 +41,8 @@ root.Refine.RefineView = class RefineView extends root.BaseView
     @resetProperties = {}
     @inSelectView = false
     
-    @add @build()
+    @table = @build()
+    @add @table
     @createCancelButton()
   
   ############################################################
@@ -155,6 +156,35 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   ### METHODS ################################################
   ############################################################
   
+  rebuild: (propertyGroups) =>
+    @propertyRows = {}
+    @changeHistory = {}
+    @resetProperties = {}
+    
+    @settings.groups = propertyGroups
+    
+    for resetProperty in @resetProperties
+      exists = false
+      for group in @settings.groups
+        for property in group
+          if resetProperty[property.field]?
+            exists = true
+      if !exists
+        delete @resetProperties[resetProperty.field]
+    
+    for changedProperty in @changeHistory
+      exists = false
+      for group in @settings.groups
+        for property in group
+          if changedProperty[group.field]?
+            exists = true
+      if !exists
+        delete @changeHistory[changedProperty.field]
+    
+    @remove @table
+    @table = @build()
+    @add @table
+  
   refreshDependencies: =>
     for field, row of @propertyRows
       if row.refineProperty.dependency?
@@ -233,8 +263,14 @@ root.Refine.RefineView = class RefineView extends root.BaseView
   refine: =>
     @settings.onRefine ( =>
       updatedProperties= {}
-      for field, obj of @changeHistory
-        updatedProperties[field] = obj.value
+      
+      # for field, obj of @changeHistory
+        # updatedProperties[field] = obj.value
+      
+      for field, obj of @propertyRows
+        Ti.API.info obj.refineProperty.value
+        updatedProperties[field] = obj.refineProperty.value
+        
       updatedProperties
     )() # Returns a object with property names and their new values
     @close() if @settings.closeOnRefine
@@ -279,6 +315,9 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       originalValue: propertyRow.refineProperty.value
       value: change.value
     }
+    
+    if propertyRow.refineProperty.onChange?
+      propertyRow.refineProperty.onChange(change.value)
     
     dynamicFields = root._.filter(@propertyRows, (row) ->
       row.refineProperty.dynamicDataDependency? and row.refineProperty.dynamicDataDependency is change.field
