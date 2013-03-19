@@ -1,4 +1,4 @@
-root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
+root.Refine.RefineSelectView = class RefineSelectView extends root.LoadingIndicatorView_Framework
   
   @Mode = {
     SINGLE: 1
@@ -81,6 +81,9 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
     @updateNavButtons(@property.mode)
     
     if @property.dynamicData?
+      @table.hide()
+      @showLoadingIndicator()
+      
       @property.dynamicData {
         dependencyValue: @settings.onPropertyFetch(@property.dynamicDataDependency)
         callback: (data) =>
@@ -121,6 +124,9 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.BaseView
       @table.index = @index
     
     @table.setData rows
+    
+    @hideLoadingIndicator()
+    @table.show()
   
   createTableRow: (label, index) =>
     options = {
