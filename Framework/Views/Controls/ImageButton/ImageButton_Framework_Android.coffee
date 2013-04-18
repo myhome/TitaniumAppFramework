@@ -16,8 +16,15 @@ root.ImageButton_Framework_Android = class ImageButton_Framework_Android extends
       right: settings.right
       bottom: settings.bottom
       left: settings.left
-      backgroundImage: @bg
     }
+    
+    @imageView = Ti.UI.createImageView {
+      top: 0, right: 0, bottom: 0, left: 0
+      image: @bg
+      backgroundColor: '#000'
+      opacity: 0
+    }
+    @button.add @imageView
     
     if settings.iconSettings?
       @icon = Ti.UI.createImageView(settings.iconSettings)
@@ -49,23 +56,27 @@ root.ImageButton_Framework_Android = class ImageButton_Framework_Android extends
   togglePressed: =>
     if @button.isPressed
       @button.isPressed = false
-      @button.backgroundImage = @bg
+      @imageView.opacity = 0
     else
       @button.isPressed = true
-      @button.backgroundImage = @bgPressed
+      @imageView.opacity = 0.3
       
   onTouchStart: =>
-    @button.backgroundImage = @bgPressed
+    @imageView.opacity = 0.3
     
   onTouchEnd: =>
     @options.onClick()
-    @button.backgroundImage = @bg if !@button.isPressed
+    @imageView.opacity = 0 if !@button.isPressed
+    
+  onTouchCancel: =>
+    @button.opacity = 0 if !@button.isPressed
      
   setEnabled: (enabled) =>
     if @enabled != enabled
       if enabled
         @button.addEventListener "touchstart", @onTouchStart
         @button.addEventListener "click", @onTouchEnd
+        @button.addEventListener "touchcancel", @onTouchCancel
         if @label?
           @label.setOpacity(1)
         if @icon?
@@ -74,6 +85,7 @@ root.ImageButton_Framework_Android = class ImageButton_Framework_Android extends
       else
         @button.removeEventListener "touchstart", @onTouchStart
         @button.removeEventListener "click", @onTouchEnd
+        @button.addEventListener "touchcancel", @onTouchCancel
         if @label?
           @label.setOpacity(0.4)
         if @icon?
