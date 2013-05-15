@@ -1,6 +1,8 @@
 root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework extends root.BaseView
   constructor:(options = {}) ->
-    super root._.extend {}, options
+    super root._.extend {
+      loadingIndicatorBorderColor: '#fff'
+    }, options
     
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
       @loadingView = Ti.UI.createView {
@@ -8,7 +10,7 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
         zIndex: 1000
         backgroundColor: '#222'
         borderRadius: 10
-        borderColor: '#fff'
+        borderColor: @settings.loadingIndicatorBorderColor
         borderWidth: 5
       }
       
