@@ -20,11 +20,11 @@ root.ImageButton_Framework = class ImageButton_Framework
     @bg = "/Common/Framework/Images/iOS/TitleBar/Buttons/back.png"
     @bgPressed = "/Common/Framework/Images/iOS/TitleBar/Buttons/backPressed.png"
 
-    @button = Ti.UI.createLabel({
+    @button = Ti.UI.createView {
       backgroundColor: settings.backgroundColor
       backgroundImage: @bg
       backgroundLeftCap: 15
-      backgroundRightCap: 10
+      backgroundRightCap: 15
       height: 30
       width: Ti.UI.SIZE
       layout: "horizontal"
@@ -32,7 +32,7 @@ root.ImageButton_Framework = class ImageButton_Framework
       right: settings.right
       bottom: settings.bottom
       left: settings.left
-    })
+    }
 
     if settings.iconSettings?
       @icon = Ti.UI.createImageView(settings.iconSettings)
@@ -67,7 +67,7 @@ root.ImageButton_Framework = class ImageButton_Framework
     else
       @bgPressed = "/Common/Framework/Images/iOS/TitleBar/Buttons/buttonPressed.png"
 
-    @button = Ti.UI.createLabel({
+    @button = Ti.UI.createView {
       backgroundColor: settings.backgroundColor
       backgroundImage: @bg
       backgroundLeftCap: 10
@@ -79,7 +79,7 @@ root.ImageButton_Framework = class ImageButton_Framework
       right: settings.right
       bottom: settings.bottom
       left: settings.left
-    })
+    }
 
     if settings.iconSettings?
       @icon = Ti.UI.createImageView(settings.iconSettings)
