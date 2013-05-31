@@ -15,18 +15,21 @@ root.MobileAppBase = class MobileAppBase
       useImageButtons: false
     }, options)
     
-    if @settings.googleAnalyticsID
-      @analytics = new Analytics(@settings.googleAnalyticsID, @settings.appName, @settings.appVersion)
-      @analytics.start(10)
+    @configureGoogleAnalytics()
     
     if Ti.Filesystem.getFile('dev.env').exists()
       @settings.accountDomain = @settings.devAccountDomain
     
-    @sounds = new root.SoundCache()
     @classFactory = new root.ClassFactory({ ignoreAndroidTablet: @settings.ignoreAndroidTablet })
+    @sounds = new root.SoundCache()
     @network = new root.Network()
     
     Ti.Network.addEventListener('change', (e) => @checkInternet(e.online) if !@checking)
+  
+  configureGoogleAnalytics: =>
+    if @settings.googleAnalyticsID?
+      @analytics = new Analytics(@settings.googleAnalyticsID, Ti.App.name, Ti.App.version)
+      @analytics.start(10)
   
   delay: (ms, func) ->
     if ms == 0 then func() else setTimeout(func, ms)
