@@ -1,7 +1,6 @@
 root.MobileAppBase = class MobileAppBase
   constructor: (options) ->
-    @settings = root._.extend({
-      title: 'MobileAppBase'
+    @settings = root._.extend {
       viewBackgroundImage: null
       viewBackgroundRepeat: true
       viewBackgroundColor: null
@@ -13,14 +12,14 @@ root.MobileAppBase = class MobileAppBase
       noInternetViewEnabled: false
       ignoreAndroidTablet: false
       useImageButtons: false
-    }, options)
+    }, options
     
     @configureGoogleAnalytics()
     
     if Ti.Filesystem.getFile('dev.env').exists()
       @settings.accountDomain = @settings.devAccountDomain
     
-    @classFactory = new root.ClassFactory({ ignoreAndroidTablet: @settings.ignoreAndroidTablet })
+    @classFactory = new root.ClassFactory { ignoreAndroidTablet: @settings.ignoreAndroidTablet }
     @sounds = new root.SoundCache()
     @network = new root.Network()
     
@@ -70,4 +69,4 @@ root.MobileAppBase = class MobileAppBase
 
     @checking = false
       
-  trackPageview: (pageUrl) => @analytics.trackPageview(pageUrl) if @analytics
+  trackPageview: (pageUrl) => @analytics.trackPageview(pageUrl) if @analytics?
