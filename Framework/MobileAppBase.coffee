@@ -1,3 +1,4 @@
+Ti.include('/Common/Framework/Lib/analytics.js');
 root.MobileAppBase = class MobileAppBase
   constructor: (options) ->
     @settings = root._.extend {
