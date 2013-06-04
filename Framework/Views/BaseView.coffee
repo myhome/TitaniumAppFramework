@@ -1,23 +1,27 @@
 root.BaseView = class BaseView
   constructor: (options = {}) ->
     @uiInitialised = false
-    @settings = root._.extend({
+    @settings = root._.extend {
       title: ''
       backgroundColor: root.app.settings.viewBackgroundColor
       backgroundGradient: root.app.settings.viewBackgroundGradient
+      backgroundImage: root.app.settings.viewBackgroundImage
       barColor: root.app.settings.viewTitleBarColor
-      backgroundImage: root.app.settings.viewBackgroundImage     # Commented out: CMC : Causing backgroundColor to fail on Android when '' | null
-      viewTitleBarStyle: root.app.settings.viewTitleBarStyle
       useTitleBarStyle: true
+      viewTitleBarStyle: root.app.settings.viewTitleBarStyle
+      style: root.app.settings.style
       useImageButtons: root.app.settings.useImageButtons
       orientationModes: root.app.settings.defaultOrientationModes
       disposeOnClose: false
-    }, options)
-    @applyStyle()
+    }, options
+    
+    @builtInStyles = ['blueCloth', 'cyanCloth', 'greenCloth', 'greyCloth', 'orangeCloth', 'pinkCloth', 'purpleCloth', 'redCloth']
     
     @isPortrait = (Ti.UI.orientation == Ti.UI.PORTRAIT || Ti.UI.orientation == Ti.UI.UPSIDE_PORTRAIT)
     @isLandscape = (Ti.UI.orientation == Ti.UI.LANDSCAPE_LEFT || Ti.UI.orientation == Ti.UI.LANDSCAPE_RIGHT)
     
+    @applyStyle()
+
     @controls = []
 
     @window = Ti.UI.createWindow(@settings)
@@ -27,6 +31,27 @@ root.BaseView = class BaseView
     
     @buildLayout()
     @assignDefaultButtons()
+  
+  onInit: ->
+    Ti.App.addEventListener("forceLandscapeWindow", (e) => @window.orientationModes = [Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT])
+    Ti.Gesture.addEventListener("orientationchange", (e) =>
+      if Ti.UI.orientation == Ti.UI.PORTRAIT || Ti.UI.orientation == Ti.UI.UPSIDE_PORTRAIT
+        @isPortrait = true
+        @isLandscape = false
+        @onPortrait()
+      else
+        @isLandscape = true
+        @isPortrait = false
+        @onLandscape()
+    )
+    
+    if @isPortrait
+      @onPortrait()
+    if @isLandscape
+      @onLandscape()
+  
+  #######################################################################
+  ## UI #################################################################
   
   buildLayout: =>
     if Ti.Platform.osname == "android" && !@settings.isHome
@@ -64,47 +89,76 @@ root.BaseView = class BaseView
         }
         @window.setRightNavButton(button.view)
       
-  applyStyle: -> #TODO: GJ: add support for different platforms
-    if @settings.viewTitleBarStyle?
-      if Ti.Platform.osname == 'ipad'
-        @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/iPad/#{@settings.viewTitleBarStyle}.png"
-      else
-        @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/#{@settings.viewTitleBarStyle}.png"
-    if @settings.style?
-      if @settings.style == 'brushedMetal'
+  applyStyle: =>
+    if @settings.style in @builtInStyles
+      if @settings.viewTitleBarStyle?
         if Ti.Platform.osname == 'ipad'
-          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal-ipad.jpg'
+          @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/iPad/#{@settings.viewTitleBarStyle}.png"
         else
-          @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
-       #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
-
-  focus: (e) =>
-    #Ti.API.info 'BaseView.focus'
-    @onInit() if !@uiInitialised
-    @onFocus()
-    @uiInitialised = true
-    
-  onInit: ->
-    Ti.App.addEventListener("forceLandscapeWindow", (e) => @window.orientationModes = [Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT])
-    Ti.Gesture.addEventListener("orientationchange", (e) =>
-      if Ti.UI.orientation == Ti.UI.PORTRAIT || Ti.UI.orientation == Ti.UI.UPSIDE_PORTRAIT
-        @isPortrait = true
-        @isLandscape = false
-        @onPortrait()
-      else
-        @isLandscape = true
-        @isPortrait = false
-        @onLandscape()
-    )
-    
-    if @isPortrait
-      @onPortrait()
-    if @isLandscape
-      @onLandscape()
+          @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/#{@settings.viewTitleBarStyle}.png"
+        
+      if @settings.style?
+        if @settings.style == 'brushedMetal'
+          if Ti.Platform.osname == 'ipad'
+            @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal-ipad.jpg'
+          else
+            @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
+         #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
+    else
+      @applyTitleBarStyle()
+      @applyBackgroundStyle()
       
-  onFocus: ->
-    #Ti.API.info 'BaseView.onFocus'
+  applyTitleBarStyle: =>
+    if Ti.Platform.osname in ['iphone', 'ipad']
+      barImage = null
+      if Ti.Platform.osname is 'iphone'
+        if @isPortrait
+          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar.png"
+        else
+          if @isIPhone5()
+            barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-landscape-568h.png"
+          else
+            barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-landscape.png"
+      else if Ti.Platform.osname is 'ipad'
+        if @isPortrait
+          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-ipad.png"
+        else
+          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-ipad-landscape.png"
+      
+      if barImage? then @settings.barImage = barImage
+      
+    else if Ti.Platform.osname is 'android'
+      Ti.API.info 'BaseView.applyTitleBarStyle is Android, do nothing'
+  
+  applyBackgroundStyle: =>
+    if Ti.Platform.osname in ['iphone', 'ipad']
+      backgroundImage = null
+      if Ti.Platform.osname is 'iphone'
+        if @isPortrait
+          if @isIPhone5()
+            backgroundImage = "/Images/style/#{@settings.style}/background/background-568h.png"
+          else
+            backgroundImage = "/Images/style/#{@settings.style}/background/background.png"
+        else
+          if @isIPhone5()
+            backgroundImage = "/Images/style/#{@settings.style}/background/background-landscape-568h.png"
+          else
+            backgroundImage = "/Images/style/#{@settings.style}/background/background-landscape.png"
+      else if Ti.Platform.osname is 'ipad'
+        if @isPortrait
+          backgroundImage = "/Images/style/#{@settings.style}/background/background-ipad.png"
+        else
+          backgroundImage = "/Images/style/#{@settings.style}/background/background-ipad-landscape.png"
+      
+      if backgroundImage? then @settings.backgroundImage = backgroundImage
+      
+    else if Ti.Platform.osname is 'android'
+      Ti.API.info 'BaseView.applyTitleBarStyle is Android, do nothing'
     
+
+  #######################################################################
+  ## METHODS ############################################################
+
   show: (options = {}) =>
     if @settings.navigationGroup?
       @settings.navigationGroup.open(@window, options)
@@ -119,7 +173,12 @@ root.BaseView = class BaseView
     else
       @open options
     @isOpen = true
-      
+  
+  focus: (e) =>
+    @onInit() if !@uiInitialised
+    @onFocus()
+    @uiInitialised = true
+  
   open: (options = {}) =>
     options = root._.extend({}, options)
     @window.open(options)
@@ -137,11 +196,6 @@ root.BaseView = class BaseView
       @window.close(options)
     @isOpen = false
       
-  onClose: =>
-    @dispose() if @settings.disposeOnClose
-    
-  onBlur: ->
-  
   dispose: =>    
     @clear()
     @content = null
@@ -160,15 +214,30 @@ root.BaseView = class BaseView
       @content.remove control
     @controls = []
     
-  click: (callback) ->
+  click: (callback) ->  #TODO: Is this used anywhere
     @window.addEventListener("click", callback)
-    
-    
-  # events for orientation changes
-  onPortrait: ->
-    
-  onLandscape: ->
-
-  addHeader: (header) ->
+  
+  addHeader: (header) ->  #TODO: Is this used anywhere
     @window.add(header)
     @content.top = header.height
+  
+  isIPhone5: ->
+    if Ti.Platform.displayCaps.platformHeight is 568 then true else false
+  
+  #######################################################################
+  ## EVENTS #############################################################
+  
+  onFocus: ->
+    Ti.API.info 'BaseView.onFocus'
+
+  onBlur: ->
+    Ti.API.info 'BaseView.onBlur'
+  
+  onClose: =>
+    @dispose() if @settings.disposeOnClose
+  
+  onPortrait: ->
+    Ti.API.info 'BaseView.onPortrait'
+    
+  onLandscape: ->
+    Ti.API.info 'BaseView.onPortrait'
