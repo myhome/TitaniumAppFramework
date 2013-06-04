@@ -50,6 +50,8 @@ root.Network = class Network
       options.xhr.send(JSON.stringify(options.params))
     else
       options.xhr.send(options.params)
+  
+    options.xhr
     
   reset: (options) =>
     if @xhr.readyState not in [0,4]
