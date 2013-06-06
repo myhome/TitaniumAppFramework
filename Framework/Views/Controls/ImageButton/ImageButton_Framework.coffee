@@ -118,14 +118,14 @@ root.ImageButton_Framework = class ImageButton_Framework
       @button.backgroundImage = @bgPressed
      
   onTouchStart: =>
-    @button.backgroundImage = @bgPressed
+    @button.backgroundImage = @bgPressed if !@button.isPressed?
   
   onTouchEnd: =>
     @options.onClick()
-    @button.backgroundImage = @bg
+    @button.backgroundImage = @bg if !@button.isPressed?
   
   onTouchCancel: =>
-    @button.backgroundImage = @bg
+    @button.backgroundImage = @bg if !@button.isPressed?
      
   setEnabled: (enabled) =>
     if @enabled != enabled
