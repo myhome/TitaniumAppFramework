@@ -48,6 +48,7 @@ root.Button_Framework = class Button_Framework
     @view.addEventListener("singletap", () => @settings.onClick() if @view.enabled)
     @view.addEventListener("touchstart", () => @onTouchStart() if @view.enabled)
     @view.addEventListener("touchend", () => @onTouchEnd() if @view.enabled)
+    @view.addEventListener("touchcancel", () => @onTouchEnd() if @view.enabled)
     
     @button = Ti.UI.createView({
       height: Ti.UI.FILL
