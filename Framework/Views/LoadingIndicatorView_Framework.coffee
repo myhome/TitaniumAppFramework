@@ -2,6 +2,7 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
   constructor:(options = {}) ->
     super root._.extend {
       loadingIndicatorBorderColor: '#fff'
+      noResultsLabel: 'No Results'
     }, options
     
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
@@ -54,6 +55,10 @@ root.LoadingIndicatorView_Framework = class LoadingIndicatorView_Framework exten
       @loadingView.hide() if @loadingView?
     else
       @activityIndicator.hide() if @activityIndicator?
+  
+  showNoResultsView: =>
+  
+  hideNoResultsView: =>
   
   dispose: =>
     if Ti.Platform.osname == "iphone" || Ti.Platform.osname == "ipad"
