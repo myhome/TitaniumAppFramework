@@ -56,11 +56,9 @@ root.Network = class Network
   reset: (options) =>
     if @xhr.readyState not in [0,4]
       Ti.API.info('-------------- Something happening')
+      @xhr.abort()
       @activeRequest.onAbort() if @activeRequest? && @activeRequest.onAbort?
-    
-    Ti.API.info("----- xhr abort -----")
-    @xhr.abort()
-    @activeRequest = null
+      @activeRequest = null
 
   hasActiveRequest: =>
     @activeRequest?
