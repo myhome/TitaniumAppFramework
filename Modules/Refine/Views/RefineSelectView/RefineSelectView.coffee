@@ -7,7 +7,6 @@ root.Refine.RefineSelectView = class RefineSelectView extends root.LoadingIndica
   
   constructor: (options = {}) ->
     super root._.extend {
-      style: 'brushedMetal'
       onChange: -> 'root.Refine.RefineSelectView: onChange'
       onConditionCheck: -> 'root.Refine.RefineSelectView: onConditionCheck'
       enableSelectIndex: false
