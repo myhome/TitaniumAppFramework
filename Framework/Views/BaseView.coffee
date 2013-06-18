@@ -2,7 +2,7 @@ root.BaseView = class BaseView
   constructor: (options = {}) ->
     @uiInitialised = false
     @settings = root._.extend {
-      title: 'BaseView'
+      title: ''
       barColor: root.app.settings.viewTitleBarColor
       backgroundColor: root.app.settings.viewBackgroundColor
       backgroundGradient: root.app.settings.viewBackgroundGradient
