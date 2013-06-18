@@ -31,6 +31,9 @@ root.HeaderControl_Framework_Android = class HeaderControl_Framework_Android
 
   setLeftNavButton: =>
     alert 'HeaderControl_Framework_Android: setLeftNavButton'
-    
+  
   setRightNavButton: =>
     alert 'HeaderControl_Framework_Android: setRightNavButton'
+    
+  setBarColor: (color) =>
+    @view.setBackgroundColor(color) if @view?

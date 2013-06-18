@@ -14,6 +14,7 @@ root.BaseView = class BaseView
     }, options
     
     @controls = []
+    @hasNewStyle = false
     
     @isPortrait = (Ti.UI.orientation == Ti.UI.PORTRAIT || Ti.UI.orientation == Ti.UI.UPSIDE_PORTRAIT)
     @isLandscape = (Ti.UI.orientation == Ti.UI.LANDSCAPE_LEFT || Ti.UI.orientation == Ti.UI.LANDSCAPE_RIGHT)
@@ -150,8 +151,8 @@ root.BaseView = class BaseView
       @window.backgroundColor = @settings.backgroundColor
       @window.backgroundImage = @settings.backgroundImage
     else if Ti.Platform.osname in ['android']
-      @header.view.backgroundColor = @settings.barColor
-      @window.backgroundColor = @settings.backgroundColor
+      @hasNewStyle = true
+      
   
   ## METHODS ############################################################
   #######################################################################
@@ -225,8 +226,13 @@ root.BaseView = class BaseView
   ## EVENTS #############################################################
   #######################################################################
   
-  onFocus: ->
+  onFocus: =>
     Ti.API.info 'BaseView.onFocus'
+    # Applying any new style for android here because it was causing android to crash.
+    if @hasNewStyle and Ti.Platform.osname in ['android']
+      @window.setBackgroundColor @settings.backgroundColor
+      @header.setBarColor @settings.barColor
+      @hasNewStyle = false
 
   onBlur: ->
     Ti.API.info 'BaseView.onBlur'
@@ -235,7 +241,7 @@ root.BaseView = class BaseView
     @dispose() if @settings.disposeOnClose
   
   onPortrait: =>
-    Ti.API.info 'BaseView.onPortrait'
+    # Ti.API.info 'BaseView.onPortrait'
     
   onLandscape: =>
-    Ti.API.info 'BaseView.onLandscape'
+    # Ti.API.info 'BaseView.onLandscape'
