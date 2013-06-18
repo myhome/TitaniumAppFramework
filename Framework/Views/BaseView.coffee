@@ -2,34 +2,28 @@ root.BaseView = class BaseView
   constructor: (options = {}) ->
     @uiInitialised = false
     @settings = root._.extend {
-      title: ''
+      title: 'BaseView'
+      barColor: root.app.settings.viewTitleBarColor
       backgroundColor: root.app.settings.viewBackgroundColor
       backgroundGradient: root.app.settings.viewBackgroundGradient
       backgroundImage: root.app.settings.viewBackgroundImage
-      barColor: root.app.settings.viewTitleBarColor
-      useTitleBarStyle: true
-      viewTitleBarStyle: root.app.settings.viewTitleBarStyle
-      style: root.app.settings.style
+      style: root.app.settings.style # Style will override barColor, backgroundColor, backgroundGradient and backgroundImage if present
       useImageButtons: root.app.settings.useImageButtons
       orientationModes: root.app.settings.defaultOrientationModes
       disposeOnClose: false
     }, options
     
-    @builtInStyles = ['blueCloth', 'cyanCloth', 'greenCloth', 'greyCloth', 'orangeCloth', 'pinkCloth', 'purpleCloth', 'redCloth']
+    @controls = []
     
     @isPortrait = (Ti.UI.orientation == Ti.UI.PORTRAIT || Ti.UI.orientation == Ti.UI.UPSIDE_PORTRAIT)
     @isLandscape = (Ti.UI.orientation == Ti.UI.LANDSCAPE_LEFT || Ti.UI.orientation == Ti.UI.LANDSCAPE_RIGHT)
     
-    @applyStyle()
+    @applyStyle() if @settings.style?
 
-    @controls = []
-
-    @window = Ti.UI.createWindow(@settings)
-    @window.addEventListener('focus', @focus)
-    @window.addEventListener('close', @onClose)
-    @window.addEventListener('blur', @onBlur)
+    @createWindow()
     
     @buildLayout()
+    
     @assignDefaultButtons()
   
   onInit: ->
@@ -50,9 +44,16 @@ root.BaseView = class BaseView
     if @isLandscape
       @onLandscape()
   
-  #######################################################################
-  ## UI #################################################################
   
+  ## UI #################################################################
+  #######################################################################
+  
+  createWindow: =>
+    @window = Ti.UI.createWindow(@settings)
+    @window.addEventListener('focus', @focus)
+    @window.addEventListener('close', @onClose)
+    @window.addEventListener('blur', @onBlur)
+    
   buildLayout: =>
     if Ti.Platform.osname == "android" && !@settings.isHome
       @header = root.app.create('HeaderControl', {
@@ -79,85 +80,81 @@ root.BaseView = class BaseView
         button = root.app.create 'ImageButton', {
           type: 'back'
           text: 'Back'
-          onClick: => @close()
+          onClick: @close
         }
         @window.setLeftNavButton button.view
       else if @settings.useImageButtons && @settings.hasDoneButton
         button = root.app.create 'ImageButton', {
           text: 'Done'
-          onClick: => @close()
+          onClick: @close
         }
         @window.setRightNavButton(button.view)
       
   applyStyle: =>
-    if @settings.style in @builtInStyles
-      if @settings.viewTitleBarStyle?
-        if Ti.Platform.osname == 'ipad'
-          @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/iPad/#{@settings.viewTitleBarStyle}.png"
-        else
-          @settings.barImage = "/Common/Framework/Images/iOS/TitleBar/#{@settings.viewTitleBarStyle}.png"
-        
-      if @settings.style?
-        if @settings.style == 'brushedMetal'
-          if Ti.Platform.osname == 'ipad'
-            @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal-ipad.jpg'
-          else
-            @settings.backgroundImage = '/Common/Framework/Images/Patterns/brushedMetal.png'
-         #@settings.backgroundRepeat = true #NOTE: GJ: waiting for titanium retina bug to be fixed
-    else
-      @applyTitleBarStyle()
-      @applyBackgroundStyle()
-      
-  applyTitleBarStyle: =>
+    
+    # Override predefined styles with style parameters
+    @settings.barColor = @settings.style.barColor if @settings.style.barColor?
+    @settings.backgroundColor = @settings.style.backgroundColor if @settings.style.backgroundColor?
+    
+    # If platform iOS(iPhone/iPad) then set barImage to appropriate image file
     if Ti.Platform.osname in ['iphone', 'ipad']
       barImage = null
       if Ti.Platform.osname is 'iphone'
         if @isPortrait
-          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar.png"
+          barImage = "/Images/style/#{@settings.style.name}/titlebar/titlebar.png"
         else
           if @isIPhone5()
-            barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-landscape-568h.png"
+            barImage = "/Images/style/#{@settings.style.name}/titlebar/titlebar-landscape-568h.png"
           else
-            barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-landscape.png"
+            barImage = "/Images/style/#{@settings.style.name}/titlebar/titlebar-landscape.png"
       else if Ti.Platform.osname is 'ipad'
         if @isPortrait
-          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-ipad.png"
+          barImage = "/Images/style/#{@settings.style.name}/titlebar/titlebar-ipad.png"
         else
-          barImage = "/Images/style/#{@settings.style}/titlebar/titlebar-ipad-landscape.png"
-      
-      if barImage? then @settings.barImage = barImage
-      
-    else if Ti.Platform.osname is 'android'
-      Ti.API.info 'BaseView.applyTitleBarStyle is Android, do nothing'
-  
-  applyBackgroundStyle: =>
+          barImage = "/Images/style/#{@settings.style.name}/titlebar/titlebar-ipad-landscape.png"
+      @settings.barImage = barImage
+    
+    # If platform iOS(iPhone/iPad) then set backgroundImage to appropriate image file
     if Ti.Platform.osname in ['iphone', 'ipad']
       backgroundImage = null
       if Ti.Platform.osname is 'iphone'
         if @isPortrait
           if @isIPhone5()
-            backgroundImage = "/Images/style/#{@settings.style}/background/background-568h.png"
+            backgroundImage = "/Images/style/#{@settings.style.name}/background/background-568h.png"
           else
-            backgroundImage = "/Images/style/#{@settings.style}/background/background.png"
+            backgroundImage = "/Images/style/#{@settings.style.name}/background/background.png"
         else
           if @isIPhone5()
-            backgroundImage = "/Images/style/#{@settings.style}/background/background-landscape-568h.png"
+            backgroundImage = "/Images/style/#{@settings.style.name}/background/background-landscape-568h.png"
           else
-            backgroundImage = "/Images/style/#{@settings.style}/background/background-landscape.png"
+            backgroundImage = "/Images/style/#{@settings.style.name}/background/background-landscape.png"
       else if Ti.Platform.osname is 'ipad'
         if @isPortrait
-          backgroundImage = "/Images/style/#{@settings.style}/background/background-ipad.png"
+          backgroundImage = "/Images/style/#{@settings.style.name}/background/background-ipad.png"
         else
-          backgroundImage = "/Images/style/#{@settings.style}/background/background-ipad-landscape.png"
+          backgroundImage = "/Images/style/#{@settings.style.name}/background/background-ipad-landscape.png"
       
-      if backgroundImage? then @settings.backgroundImage = backgroundImage
+      @settings.backgroundImage = backgroundImage
       
-    else if Ti.Platform.osname is 'android'
-      Ti.API.info 'BaseView.applyTitleBarStyle is Android, do nothing'
-    
-
-  #######################################################################
+  updateStyle: (styleRequest) =>
+    if root.app.settings.dynamicStyle?
+      style = root.app.settings.dynamicStyle(styleRequest)
+      if style?
+        @settings.style = style
+        @applyStyle()
+        @refreshStyle()
+  
+  refreshStyle: =>
+    if Ti.Platform.osname in ['iphone', 'ipad']
+      @window.barImage = @settings.barImage
+      @window.backgroundColor = @settings.backgroundColor
+      @window.backgroundImage = @settings.backgroundImage
+    else if Ti.Platform.osname in ['android']
+      @header.view.backgroundColor = @settings.barColor
+      @window.backgroundColor = @settings.backgroundColor
+  
   ## METHODS ############################################################
+  #######################################################################
 
   show: (options = {}) =>
     if @settings.navigationGroup?
@@ -224,8 +221,9 @@ root.BaseView = class BaseView
   isIPhone5: ->
     if Ti.Platform.displayCaps.platformHeight is 568 then true else false
   
-  #######################################################################
+  
   ## EVENTS #############################################################
+  #######################################################################
   
   onFocus: ->
     Ti.API.info 'BaseView.onFocus'
@@ -236,8 +234,8 @@ root.BaseView = class BaseView
   onClose: =>
     @dispose() if @settings.disposeOnClose
   
-  onPortrait: ->
+  onPortrait: =>
     Ti.API.info 'BaseView.onPortrait'
     
-  onLandscape: ->
-    Ti.API.info 'BaseView.onPortrait'
+  onLandscape: =>
+    Ti.API.info 'BaseView.onLandscape'

@@ -359,8 +359,7 @@ root.Refine.RefineView = class RefineView extends root.BaseView
       @inSelectView = true
       refineSelectView = root.app.create('Refine.RefineSelectView', {
         getTitleLabel: @settings.getTitleLabel
-        viewTitleBarStyle: @settings.viewTitleBarStyle
-        barColor: @settings.barColor
+        style: @settings.style
         fontThemeColor: @settings.fontThemeColor
         rowSelectedBackgroundColor: @settings.rowSelectedBackgroundColor
         onChange: @onChange
