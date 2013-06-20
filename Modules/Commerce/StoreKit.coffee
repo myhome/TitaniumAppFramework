@@ -5,7 +5,7 @@ root.Commerce.StoreKit = class StoreKit
   constructor: ->
     @tiStorekit = require('ti.storekit')
      
-  canMakePayments: -> @tiStorekit.canMakePayments
+  canMakePayments: -> @tiStorekit.canMakePayments 
   
   getProduct: (indentifier, options = {}) ->
     @tiStorekit.requestProducts [indentifier], (e) ->
@@ -15,9 +15,7 @@ root.Commerce.StoreKit = class StoreKit
         options.onInvalidProduct(e) if options.onInvalidProduct?
       else
         options.onSuccess(e.products[0]) if options.onSuccess?
-        
   
-        
   purchase: (identifier, options = {}) =>
     options = root._.extend({
       onInvalidProduct: ->
@@ -36,14 +34,12 @@ root.Commerce.StoreKit = class StoreKit
       onError: options.onError
       onInvalidProduct: options.onInvalidProduct
     }
-    
-  purchaseProduct: (product, options = {}) =>
-    @tiStorekit.purchase product, (e) =>
-      Ti.API.info('root.Commerce.StoreKit : purchase -- reply') 
-      switch e.state
-        when @tiStorekit.FAILED then options.onFailed(e, product) if options.onFailed
-        when @tiStorekit.PURCHASED then options.onPurchased(e, product) if options.onPurchased
-        when @tiStorekit.RESTORED then options.onRestored(e, product) if options.onRestored
-    
-    
   
+  purchaseProduct: (product, options = {}) =>
+    @tiStorekit.purchase product
+    # , (e) =>
+#       Ti.API.info('root.Commerce.StoreKit : purchase -- reply') 
+#       switch e.state
+#         when @tiStorekit.FAILED then options.onFailed(e, product) if options.onFailed
+#         when @tiStorekit.PURCHASED then options.onPurchased(e, product) if options.onPurchased
+#         when @tiStorekit.RESTORED then options.onRestored(e, product) if options.onRestored
